@@ -10,6 +10,8 @@
 // Importing cocos2d.h and cocos2d-ui.h, will import anything you need to start using Cocos2D v3
 #import "cocos2d.h"
 #import "cocos2d-ui.h"
+#import "KeychainItemWrapper.h"
+#import <FacebookSDK/FacebookSDK.h>
 
 static NSString *KeyHighScore = @"high_score";
 // -----------------------------------------------------------------------
@@ -21,15 +23,24 @@ static NSString *KeyHighScore = @"high_score";
 /**
  *  The main scene
  */
+
+@class  ContactServer;
+
 @interface HelloWorldScene : CCScene
 {
     CCActionRepeatForever *_fightRepeat;
     BOOL _isGemeOver;
-    
+    BOOL _isNewBest;
 }
 // -----------------------------------------------------------------------
 @property(nonatomic,assign)NSInteger sceneType;
 @property(nonatomic,strong) id<ALSoundSource> fightEngine;
+@property(nonatomic,strong)KeychainItemWrapper *cherryIDSafeStore;
+@property(nonatomic,strong)NSNumber *cherryID;
+@property(nonatomic,strong)NSNumber *worldHiscore;
+@property(nonatomic,assign)float beatrank;
+@property(nonatomic,strong)ContactServer *connServer;
+
 + (HelloWorldScene *)scene;
 - (id)init;
 

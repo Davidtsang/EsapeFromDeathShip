@@ -8,6 +8,8 @@
 // -----------------------------------------------------------------------
 
 #import "cocos2d.h"
-
+#import <FacebookSDK/FacebookSDK.h>
 @interface AppDelegate : CCAppDelegate
+
+- (void)sessionStateChanged:(FBSession *)session state:(FBSessionState) state error:(NSError *)error;
 @end

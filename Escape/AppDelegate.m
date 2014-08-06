@@ -8,8 +8,8 @@
 // -----------------------------------------------------------------------
 
 #import "AppDelegate.h"
-
 #import "HelloWorldScene.h"
+
 
 @implementation AppDelegate
 
@@ -43,9 +43,28 @@
 //		CCSetupTabletScale2X: @(YES),
 	}];
 	
+    // Whenever a person opens the app, check for a cached session
+    if (FBSession.activeSession.state == FBSessionStateCreatedTokenLoaded) {
+        
+        // If there's one, just open the session silently, without showing the user the login UI
+        [FBSession openActiveSessionWithPermissions:@[@"public_profile"] allowLoginUI:NO completionHandler:^(FBSession *session, FBSessionState state, NSError *error) {
+            // Handler for session state changes
+            // This method will be called EACH time the session state changes,
+            // also for intermediate states and NOT just when the session open
+            [self sessionStateChanged:session state:state error:error];
+            }];
+    }
+    
 	return YES;
 }
 
+    //FB
+    // This method will handle ALL the session state changes in the app
+- (void)sessionStateChanged:(FBSession *)session state:(FBSessionState) state error:(NSError *)error
+{
+
+}
+    
 -(CCScene *)startScene
 {
 	// This method should return the very first scene to be run when your app starts.

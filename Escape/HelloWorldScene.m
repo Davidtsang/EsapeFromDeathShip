@@ -8,9 +8,11 @@
 // -----------------------------------------------------------------------
 
 #import "HelloWorldScene.h"
-#import "IntroScene.h"
+#import "AppDelegate.h"
+
 #import "CCAnimation.h"
 //#import "ShipWall.h"
+#import "ContactServer.h"
 
 
 // -----------------------------------------------------------------------
@@ -173,9 +175,32 @@
 
  
 }
+-(void)fbLogin
+{
+    // If the session state is any of the two "open" states when the button is clicked
+    if (FBSession.activeSession.state == FBSessionStateOpen
+        || FBSession.activeSession.state == FBSessionStateOpenTokenExtended) {
+        
+        // Close the session and remove the access token from the cache
+        // The session state handler (in the app delegate) will be called automatically
+        [FBSession.activeSession closeAndClearTokenInformation];
+        
+        // If the session state is not any of the two "open" states when the button is clicked
+    } else {
+        // Open a session showing the user the login UI
+        // You must ALWAYS ask for public_profile permissions when opening a session
+        [FBSession openActiveSessionWithPermissions:@[@"public_profile"]  allowLoginUI:YES completionHandler: ^(FBSession *session, FBSessionState state, NSError *error) {
+            AppDelegate* appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+            // Call the app delegate's sessionStateChanged:state:error method to handle session state changes
+            [appDelegate sessionStateChanged:session state:state error:error];
+        
+        }];
 
+    }
+}
 -(void)showGameOver
 {
+    self.sceneType = kSceneGameOver;
     //CCButton *ranking = [CCButton b]
     CCSpriteFrame *rankingFrame = [CCSpriteFrame frameWithImageNamed:@"btn-ranking.png"];
     
@@ -210,7 +235,7 @@
     CCSpriteFrame *rateFrame = [CCSpriteFrame frameWithImageNamed:@"btn-rate.png"];
     [rateFrame.texture setAntialiased:NO];
     CCButton *rate  = [CCButton buttonWithTitle:nil spriteFrame:rateFrame];
-    
+    [rate setTarget:self selector:@selector(fbLogin)];
     
     rate.position = ccp(replay.position.x +replay.contentSize.width/2*kScaleRate + 16 + rate.contentSize.width/2*kScaleRate, ranking.position.y  );
     
@@ -269,24 +294,82 @@
     highScore.anchorPoint = ccp(1.0f,0.5f);
     highScore.position = ccp(replay.position.x +board.contentSize.width/2*kScaleRate-16, board.position.y + board.contentSize.height/2*kScaleRate - highScore.contentSize.height/2 -112);
  
-
-
+    //new label
+    CCSpriteFrame *newLabelFrame = [CCSpriteFrame frameWithImageNamed:@"new.png"];
+    [newLabelFrame.texture setAntialiased:NO];
     
-    [_gameOver addChild:ranking];
+    CCSprite *newLable = [CCSprite spriteWithSpriteFrame:newLabelFrame];
+    [newLable setScale:kScaleRate];
+    
+    newLable.position = ccp(replay.position.x - newLable.contentSize.width/2*kScaleRate-14, board.position.y + board.contentSize.height/2*kScaleRate - newLable.contentSize.height/2*kScaleRate -96);
+    
+    
+    //medal 50 -> 3 ,100 > 2, 200 gold
+    
+        [_gameOver addChild:ranking];
     [_gameOver addChild:replay];
     [_gameOver addChild:rate];
     [_gameOver addChild:board];
-    [_gameOver addChild:share];
+    [_gameOver addChild:share z:kZIndexUI name:@"btn-share"];
     [_gameOver addChild:title];
 
     [_gameOver addChild:_gameOverScore];
     [_gameOver addChild:highScore];
+    
+    BOOL showBeatrank = NO;
+    if (_isNewBest) {
+        showBeatrank = YES;
+        //[self.connServer getMyBeat:self.cherryID ];
+        [self.connServer sumbitScore:_scoreNumber withUserID:self.cherryID];
+        [_gameOver addChild:newLable];
+    }
+    
+    
+    if (_scoreNumber >= 10) {
+        
+        if (showBeatrank == NO) {
+            [self.connServer getMyBeat:self.cherryID];
+        }
+        
+        NSString *medalFile = @"medal3.png";
+        
+        if (_scoreNumber >= 50) {
+            medalFile = @"medal2.png";
+        }
+        
+        if (_scoreNumber >= 100) {
+            medalFile =@"medal1.png";
+        }
+        
+        CCSpriteFrame *medalFrame = [CCSpriteFrame frameWithImageNamed:medalFile];
+        [medalFrame.texture setAntialiased:NO];
+        
+        CCSprite *medal = [CCSprite spriteWithSpriteFrame:medalFrame];
+        [medal setScale:kScaleRate];
+        
+        medal.position  =ccp( board.boundingBox.origin.x +16+ medal.contentSize.width/2*kScaleRate, board.boundingBox.origin.y+board.contentSize.height*kScaleRate -84 + medal.contentSize.height/2*kScaleRate);
+        [_gameOver addChild:medal];
+    }
 
+    
     [self addChild:_gameOver z:kZIndexUI];
     
 
+    //word hi score
+    if (self.worldHiscore) {
+        
+        NSString *wwString =[NSString stringWithFormat:@"World hi-score: %@",self.worldHiscore];
+        
+        CCLabelBMFont *wwHiscore = [CCLabelBMFont labelWithString:wwString fntFile:@"font3-export.fnt"];
+        [wwHiscore.texture setAntialiased:NO];
+        wwHiscore.position = ccp(share.position.x ,share.position.y +56);
+        [wwHiscore setScale:kScaleRate];
+        [_gameOver addChild:wwHiscore z:kZIndexUI];
+    }
     
-    //run action
+    //beatrank
+    
+        //run action
     CCActionMoveTo *mv = [CCActionMoveTo actionWithDuration:0.5 position:ccp(0, 0)];
     [_gameOver runAction:mv];
     
@@ -313,8 +396,8 @@
 -(void)shipFloorMove:(CCTime)delta
 {
     _deathshipFloor1.position= ccp(_deathshipFloor1.position.x, _deathshipFloor1.position.y-1);
-    _deathshipFloor2.position= ccp(_deathshipFloor2.position.x, _deathshipFloor1.position.y+ _deathshipFloor1.contentSize.height );
-    if (_deathshipFloor2.position.y <= 0) {
+    _deathshipFloor2.position= ccp(_deathshipFloor2.position.x, _deathshipFloor1.position.y+ _deathshipFloor1.contentSize.height);
+    if (_deathshipFloor2.position.y  == 0) {
         [_deathshipFloor1 setPosition:ccp(_deathshipFloor1.position.x, 0)];
     }
     
@@ -339,6 +422,10 @@
             [self updateHighScore:_highScoreNumber];
             [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:_highScoreNumber] forKey:KeyHighScore];
             [[NSUserDefaults standardUserDefaults] synchronize];
+            _isNewBest = YES;
+        }else{
+            _isNewBest =    NO;
+            
         }
     }
 
@@ -518,8 +605,8 @@
             
         }
         //加分检查
-        CGSize viewSize = [CCDirector sharedDirector].viewSize;
-        float addScoreLine = viewSize.height/3 - _spaceFight.contentSize.height/2*kScaleRate+door.contentSize.height/2 ;
+        //CGSize viewSize = [CCDirector sharedDirector].viewSize;
+        NSInteger addScoreLine = (long)_spaceFight.position.y - _spaceFight.contentSize.height/2*kScaleRate;
         
         if (door.position.y == addScoreLine)
         {
@@ -601,9 +688,10 @@
     CCNode *floor1 = [CCNode node];
     floor1.userInteractionEnabled = NO;
     floor1.multipleTouchEnabled = NO;
-    CGFloat floorHight = 64*4;
+    CGFloat floorHight = 320*kScaleRate;
     floor1.contentSize = CGSizeMake([CCDirector sharedDirector].viewSize.width, floorHight) ;
     floor1.position = ccp(0,0);
+    floor1.anchorPoint = ccp(0,0);
     
 //    // Create a colored background (Dark Grey)
 //    CCNodeColor *background = [CCNodeColor nodeWithColor:[CCColor colorWithRed:0.5f green:0.2f blue:0.2f alpha:1.0f]];
@@ -611,7 +699,7 @@
     
     // add floor
     //260 4*3
-    NSInteger  partNumber = 4*3 ;
+    NSInteger  partNumber = 5*3 ;
     for (NSInteger i = 0; i < partNumber; i++) {
         //
         NSInteger yLevel = (int)i/3;
@@ -633,6 +721,7 @@
     floor2.multipleTouchEnabled = NO;
     floor2.contentSize = floor1.contentSize  ;
     floor2.position = ccp(0,floor1.contentSize.height);
+    floor2.anchorPoint = ccp(0, 0);
     
 //    // Create a colored background (Dark Grey)
 //    CCNodeColor *background2 = [CCNodeColor nodeWithColor:[CCColor colorWithRed:0.2f green:0.5f blue:0.2f alpha:1.0f]];
@@ -980,6 +1069,7 @@
 }
 -(void ) gameOver
 {
+    
     [self removeChildByName:@"space-fight" cleanup:YES];
     [[OALSimpleAudio sharedInstance] playEffect:@"explosion.wav"];
     //[[CCDirector sharedDirector] pause];
@@ -1061,8 +1151,26 @@
     
     // Enable touch handling on scene node
     self.userInteractionEnabled = YES;
+    self.worldHiscore = nil;
     
     _isGemeOver = NO;
+    
+    ContactServer *connSrv = [[ContactServer alloc] init];
+    self.connServer = connSrv;
+    
+    //get cherry id
+    self.cherryIDSafeStore = [[KeychainItemWrapper alloc] initWithIdentifier:@"cherry_board_id" accessGroup:nil];
+    
+    NSString  *cherryID =[self.cherryIDSafeStore objectForKey:(__bridge id)(kSecAttrComment)];
+    if (cherryID) {
+        self.cherryID = cherryID;
+    }else{
+        [self.connServer createUser];
+    }
+    
+    //[apiSrv sumbitScore:15 withUserID:1];
+    [self.connServer getHiScore];
+    //[apiSrv getMyBeat:1];
     
     // Create a colored background (Dark Grey)
     CCNodeColor *background = [CCNodeColor nodeWithColor:[CCColor colorWithRed:0.2f green:0.2f blue:0.2f alpha:1.0f]];
@@ -1093,26 +1201,79 @@
     {
         _highScoreNumber = [recordHighScore integerValue];
     }
-//
-//    _highScore = [CCLabelBMFont labelWithString:@"Best: 0" fntFile:@"pixel-font2.fnt" ];
-//    [self updateHighScore:_highScoreNumber];
-//    _highScore.position = ccp(20+ _highScore.contentSize.width/2,[CCDirector sharedDirector].viewSize.height - 20 - _highScore.contentSize.height/2);
-//    [_highScore.texture setAntialiased:NO];
-    //[_score setScale:kScaleRate];
+ 
     
-    //[self addChild:_highScore z:kZIndexUI ];
     
-    //[self addCtrlBtn];
+    //get hiscore
+    //[apiSrv getHiScore];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gotHiScore:) name:NoticeGotHiScore object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gotCherryID:) name:NoticeGotUserID object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gotBeatrank:) name:NoticeGotBeatRank object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(scoreSubmited:) name:NoticeScoreSubmited object:nil];
+
     return self;
 }
 
+-(void)scoreSubmited:(NSNotification *)note
+{
+    [self.connServer getMyBeat:self.cherryID];
+}
+-(void)gotBeatrank:(NSNotification *)note
+{
+    NSDictionary *theData = [note userInfo];
+    if (theData != nil) {
+        NSNumber *beatrank = [theData objectForKey:@"beatrank"];
+        self.beatrank  = [beatrank floatValue];
+      
+        NSLog(@"Beatrank is : %@", beatrank );
+        if (self.sceneType == kSceneGameOver) {
+            
+            CCNode  *share = [_gameOver getChildByName:@"btn-share" recursively:NO];
+            
+            NSString *beatrankString =[NSString stringWithFormat:@"You beat %.f%% of other player!",self.beatrank*100];
+            
+            CCLabelBMFont *beatrank = [CCLabelBMFont labelWithString:beatrankString fntFile:@"font3-export.fnt"];
+            [beatrank.texture setAntialiased:NO];
+            beatrank.position = ccp(share.position.x ,share.position.y +34);
+            [beatrank setScale:kScaleRate];
+            [_gameOver addChild:beatrank z:kZIndexUI];
+        }
+
+        
+    }
+}
+
+-(void)gotCherryID:(NSNotification *)note
+{
+    NSDictionary *theData = [note userInfo];
+    if (theData != nil) {
+        NSNumber *userID = [theData objectForKey:@"user_id"];
+        self.cherryID  = userID;
+        [self.cherryIDSafeStore setObject:userID forKey:(__bridge id)(kSecAttrComment)];
+        
+        NSLog(@"USER ID is : %@", userID );
+    }
+}
+
+-(void)gotHiScore:(NSNotification *)note
+{
+    NSDictionary *theData = [note userInfo];
+    if (theData != nil) {
+        NSNumber *n = [theData objectForKey:@"score"];
+        self.worldHiscore = n;
+        
+        NSLog(@"hi score is : %@", n );
+    }
+}
 // -----------------------------------------------------------------------
 -(void)updateHighScore:(NSInteger) newScore
 {
+    
     [_highScore setString:[NSString stringWithFormat:@"Best: %ld" , (long)newScore ]];
 }
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     // clean up code goes here
 }
 
@@ -1403,17 +1564,6 @@
     
  
     
-}
-
-// -----------------------------------------------------------------------
-#pragma mark - Button Callbacks
-// -----------------------------------------------------------------------
-
-- (void)onBackClicked:(id)sender
-{
-    // back to intro scene with transition
-    [[CCDirector sharedDirector] replaceScene:[IntroScene scene]
-                               withTransition:[CCTransition transitionPushWithDirection:CCTransitionDirectionRight duration:1.0f]];
 }
 
 // -----------------------------------------------------------------------
