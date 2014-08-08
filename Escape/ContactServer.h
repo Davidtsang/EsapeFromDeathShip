@@ -10,10 +10,14 @@
 
 
 static NSString *ApiAddress =@"https://iphonebestapp.com/cherryboard/api/v1.0";
+
+//notice
 static NSString *NoticeGotHiScore = @"got_hi_score";
 static NSString *NoticeGotUserID = @"got_user_id";
 static NSString *NoticeGotBeatRank = @"got_beatrank";
-static NSString * NoticeScoreSubmited = @"score_submited";
+static NSString *NoticeScoreSubmited = @"score_submited";
+static NSString *NoticeAddressBookSubmited =@"address_book_submited";
+
 @interface ContactServer : NSObject
 
 @property(nonatomic,strong)NSString *rqsBaseURI;
@@ -28,8 +32,9 @@ static NSString * NoticeScoreSubmited = @"score_submited";
 
 -(void)getMyBeat:(NSNumber *)userID;
 // GET /user/<id>/beatrank
-
--(void)sumbitScore:(NSInteger)score withUserID:(NSNumber *)userID;
+-(void)submitAddressbook:(NSMutableArray *)book withUserID:(NSNumber *)userID;
+-(void)submitScore:(NSInteger)score withUserID:(NSNumber *)userID;
 // PUT /api/v1.0/user/
+-(void)getFriendRankingWithLimit:(NSInteger)limit_;
 
 @end

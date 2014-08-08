@@ -11,7 +11,9 @@
 		CE020DF8198F951600FDA716 /* font3-export.png in Resources */ = {isa = PBXBuildFile; fileRef = CE020DF6198F951600FDA716 /* font3-export.png */; };
 		CE15BD5B198E7B8E00ED78AD /* CommonFuns.m in Sources */ = {isa = PBXBuildFile; fileRef = CE15BD59198E7B8E00ED78AD /* CommonFuns.m */; };
 		CE15BD5E198E9D5900ED78AD /* KeychainItemWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = CE15BD5D198E9D5900ED78AD /* KeychainItemWrapper.m */; };
+		CE3564B71994B41300317F9E /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE3564B61994B41300317F9E /* Twitter.framework */; };
 		CE63C515198BAAE4001972FC /* score-add.wav in Resources */ = {isa = PBXBuildFile; fileRef = CE63C514198BAAE4001972FC /* score-add.wav */; };
+		CE66C071199368D40043C3C5 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE66C070199368D40043C3C5 /* AddressBook.framework */; };
 		CE6787B3198B532500214CCE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6787B0198B532500214CCE /* AppDelegate.m */; };
 		CE6787B4198B532500214CCE /* HelloWorldScene.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6787B2198B532500214CCE /* HelloWorldScene.m */; };
 		CE6787DA198B53DA00214CCE /* home-title.png in Resources */ = {isa = PBXBuildFile; fileRef = CE6787B5198B53D900214CCE /* home-title.png */; };
@@ -289,7 +291,10 @@
 		CE15BD5A198E7B8E00ED78AD /* CommonFuns.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonFuns.h; sourceTree = "<group>"; };
 		CE15BD5C198E9D5900ED78AD /* KeychainItemWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeychainItemWrapper.h; sourceTree = "<group>"; };
 		CE15BD5D198E9D5900ED78AD /* KeychainItemWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeychainItemWrapper.m; sourceTree = "<group>"; };
+		CE3564B61994B41300317F9E /* Twitter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Twitter.framework; path = System/Library/Frameworks/Twitter.framework; sourceTree = SDKROOT; };
 		CE63C514198BAAE4001972FC /* score-add.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "score-add.wav"; sourceTree = "<group>"; };
+		CE66C070199368D40043C3C5 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		CE66C072199368DA0043C3C5 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
 		CE6787B0198B532500214CCE /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		CE6787B1198B532500214CCE /* HelloWorldScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelloWorldScene.h; sourceTree = "<group>"; };
 		CE6787B2198B532500214CCE /* HelloWorldScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelloWorldScene.m; sourceTree = "<group>"; };
@@ -769,6 +774,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE3564B71994B41300317F9E /* Twitter.framework in Frameworks */,
+				CE66C071199368D40043C3C5 /* AddressBook.framework in Frameworks */,
 				CE79DDD4198C894C003C71EA /* Security.framework in Frameworks */,
 				CE7210821973D486001B5D98 /* OpenAL.framework in Frameworks */,
 				CE7210881973D486001B5D98 /* UIKit.framework in Frameworks */,
@@ -881,6 +888,9 @@
 		CE72107C1973D486001B5D98 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CE3564B61994B41300317F9E /* Twitter.framework */,
+				CE66C072199368DA0043C3C5 /* AddressBookUI.framework */,
+				CE66C070199368D40043C3C5 /* AddressBook.framework */,
 				CE88661919920B5F00B6F060 /* FacebookSDK.framework */,
 				CE79DDD3198C894C003C71EA /* Security.framework */,
 				CE72107D1973D486001B5D98 /* QuartzCore.framework */,

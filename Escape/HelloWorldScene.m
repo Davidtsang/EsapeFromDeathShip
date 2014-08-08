@@ -14,6 +14,7 @@
 //#import "ShipWall.h"
 #import "ContactServer.h"
 
+#import <AddressBook/AddressBook.h>
 
 // -----------------------------------------------------------------------
 #pragma mark - HelloWorldScene
@@ -98,7 +99,7 @@
     
     
     ranking.position = ccp(32 + ranking.contentSize.width/2*kScaleRate, 32 +ranking.contentSize.height/2*kScaleRate );
-    
+    [ranking setTarget:self selector:@selector(connAddressBook)];
     [ranking setScale:kScaleRate];
     
     if (_gameHome == nil) {
@@ -175,6 +176,117 @@
 
  
 }
+-(void)readAllContacts
+{
+    NSMutableArray *book = [NSMutableArray array];
+    
+    CFErrorRef *error = NULL;
+    ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, error);
+    CFArrayRef allPeople = ABAddressBookCopyArrayOfAllPeople(addressBook);
+    CFIndex numberOfPeople = ABAddressBookGetPersonCount(addressBook);
+    
+    for(int i = 0; i < numberOfPeople; i++) {
+        
+        NSMutableArray *emails = [NSMutableArray array];
+        NSMutableArray *phones = [NSMutableArray array];
+        
+        ABRecordRef person = CFArrayGetValueAtIndex( allPeople, i );
+        
+        NSString *firstName = (__bridge NSString *)(ABRecordCopyValue(person, kABPersonFirstNameProperty));
+        NSString *lastName = (__bridge NSString *)(ABRecordCopyValue(person, kABPersonLastNameProperty));
+    
+   
+        NSLog(@"Name:%@ %@", firstName, lastName);
+        
+        
+        ABMultiValueRef phoneNumbers = ABRecordCopyValue(person, kABPersonPhoneProperty);
+        ABMultiValueRef email = ABRecordCopyValue(person, kABPersonEmailProperty);
+        for (CFIndex i = 0; i < ABMultiValueGetCount(email); i++) {
+            NSString *emailAddress = (__bridge_transfer NSString *) ABMultiValueCopyValueAtIndex(email, i);
+            NSLog(@"email:%@", emailAddress);
+            [emails addObject:emailAddress];
+        }
+        
+        for (CFIndex i = 0; i < ABMultiValueGetCount(phoneNumbers); i++) {
+            NSString *phoneNumber = (__bridge_transfer NSString *) ABMultiValueCopyValueAtIndex(phoneNumbers, i);
+            NSLog(@"phone:%@", phoneNumber);
+            [phones addObject:phoneNumber];
+            
+        }
+        
+        [book addObject:@{@"first_name":firstName, @"last_name":lastName,@"emails":emails,@"phone_numbers":phones }];
+        
+        NSLog(@"=============================================");
+        
+    }
+    [self.connServer submitAddressbook:book withUserID:self.cherryID];
+    
+    
+}
+-(void) connAddressBook
+{
+    if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusDenied ||
+        ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusRestricted){
+        //1
+        NSLog(@"Denied");
+    } else if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized){
+        //2
+        NSLog(@"Authorized");
+        [self readAllContacts];
+    } else{ //ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusNotDetermined
+        //3
+        ABAddressBookRequestAccessWithCompletion(ABAddressBookCreateWithOptions(NULL, nil), ^(bool granted, CFErrorRef error) {
+            if (!granted){
+                //4
+                NSLog(@"Just denied");
+                return;
+            }
+            //5
+            NSLog(@"Just authorized");
+        });
+    }
+    
+}
+-(void)fbUploadUserInfo
+{
+    [FBRequestConnection startForMeWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        if (!error) {
+            // Success! Include your code to handle the results here
+            NSLog(@"user info: %@", result);
+            /*
+             user info: {
+             email = "david.zen.2007@gmail.com";
+             "first_name" = David;
+             id = 10152356455103843;
+             "last_name" = Tsang;
+             link = "https://www.facebook.com/app_scoped_user_id/10152356455103843/";
+             locale = "en_US";
+             name = "David Tsang";
+             timezone = 8;
+             "updated_time" = "2014-08-03T08:18:18+0000";
+             verified = 1;
+             }
+
+             */
+        } else {
+            // An error occurred, we need to handle the error
+            // See: https://developers.facebook.com/docs/ios/errors
+        }
+    }];
+    
+    /* make the API call */
+    [FBRequestConnection startWithGraphPath:@"/me/friends"
+                                 parameters:nil
+                                 HTTPMethod:@"GET"
+                          completionHandler:^(
+                                              FBRequestConnection *connection,
+                                              id result,
+                                              NSError *error
+                                              ) {
+                              /* handle the result */
+                              NSLog(@"user info: %@", result);
+                          }];
+}
 -(void)fbLogin
 {
     // If the session state is any of the two "open" states when the button is clicked
@@ -189,12 +301,24 @@
     } else {
         // Open a session showing the user the login UI
         // You must ALWAYS ask for public_profile permissions when opening a session
-        [FBSession openActiveSessionWithPermissions:@[@"public_profile"]  allowLoginUI:YES completionHandler: ^(FBSession *session, FBSessionState state, NSError *error) {
-            AppDelegate* appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-            // Call the app delegate's sessionStateChanged:state:error method to handle session state changes
-            [appDelegate sessionStateChanged:session state:state error:error];
-        
-        }];
+        [FBSession openActiveSessionWithReadPermissions:@[@"public_profile",@"email",@"user_friends"]
+                                           allowLoginUI:YES
+                                      completionHandler:
+         ^(FBSession *session, FBSessionState state, NSError *error) {
+             
+             // Retrieve the app delegate
+             AppDelegate* appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+             // Call the app delegate's sessionStateChanged:state:error method to handle session state changes
+             [appDelegate sessionStateChanged:session state:state error:error];
+             NSLog(@"fb login event! here %@", appDelegate.fbSessionState  );
+             
+             if (appDelegate.fbSessionState == iFBSessionOpened)
+             {
+                 //read user info, email, friend
+                 [self fbUploadUserInfo];
+                 
+             }
+         }];
 
     }
 }
@@ -320,7 +444,7 @@
     if (_isNewBest) {
         showBeatrank = YES;
         //[self.connServer getMyBeat:self.cherryID ];
-        [self.connServer sumbitScore:_scoreNumber withUserID:self.cherryID];
+        [self.connServer submitScore:_scoreNumber withUserID:self.cherryID];
         [_gameOver addChild:newLable];
     }
     
@@ -1160,11 +1284,14 @@
     
     //get cherry id
     self.cherryIDSafeStore = [[KeychainItemWrapper alloc] initWithIdentifier:@"cherry_board_id" accessGroup:nil];
+    //[self.cherryIDSafeStore re];
     
-    NSString  *cherryID =[self.cherryIDSafeStore objectForKey:(__bridge id)(kSecAttrComment)];
-    if (cherryID) {
-        self.cherryID = cherryID;
-    }else{
+    //[self.cherryIDSafeStore setObject:[NSNumber numberWithInt:-1] forKey:(__bridge id)(kSecAttrComment)];
+    
+    NSNumber  *cherryID_ =[self.cherryIDSafeStore objectForKey:(__bridge id)(kSecAttrComment)];
+    if (cherryID_  && [cherryID_ integerValue] != - 1) {
+        self.cherryID = cherryID_;
+    }else {
         [self.connServer createUser];
     }
     

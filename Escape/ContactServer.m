@@ -30,6 +30,45 @@
 	return self;
 }
 
+-(void)getFriendRankingWithLimit:(NSInteger)limit_
+{
+    // address GET /user/friend_ranking
+    //1 WHO IS His friend ?
+    //some's phone num  in his book;
+}
+-(void)submitAddressbook:(NSMutableArray *)book withUserID:(NSNumber *)userID
+{
+    //POST /api/v1.0/user/address_book
+    
+    NSInteger nowTime = [[NSDate date] timeIntervalSince1970 ];
+    
+    NSString *md5AuthString = [CommonFuns makeAuthToken:[NSString stringWithFormat:@"%d",nowTime ]];
+    
+    NSString *userIDString =[CommonFuns makeAuthToken:[userID stringValue] ] ;
+    
+    //NSString *postPath = [self.rqsBaseURI stringByAppendingPathComponent:@"/user?game_id=1"];
+    NSString *postPath = [NSString stringWithFormat:@"user/%@/address_book?game_id=1&auth_token=%@&user_id=%@&time_stamp=%ld",[userID stringValue], md5AuthString,userIDString,(long)nowTime ];
+    NSURL *baseURL = [[NSURL alloc] initWithString:_rqsBaseURI];
+    
+    NSDictionary *param =@{@"address_book": book };
+    AFHTTPClient *client = [AFHTTPClient clientWithBaseURL:baseURL];
+    [client setParameterEncoding:AFJSONParameterEncoding];
+    NSMutableURLRequest *request = [client requestWithMethod:@"POST"
+                                                        path:postPath
+                                                  parameters:param];
+    
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        NSLog(@"%@", JSON);
+        //[JSON objectForKey:@"success"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:NoticeAddressBookSubmited object:self];
+        
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        NSLog(@"Request Failed with Error: %@, %@", error, error.userInfo);
+    }];
+    
+    [operation start];
+    
+}
 -(void)getHiScore
 {
 
@@ -85,7 +124,7 @@
     [operation start];
     
 }
--(void)sumbitScore:(NSInteger)score withUserID:(NSNumber *)userID
+-(void)submitScore:(NSInteger)score withUserID:(NSNumber *)userID
 {
     //PUT /api/v1.0/user/
     NSInteger nowTime = [[NSDate date] timeIntervalSince1970 ];
