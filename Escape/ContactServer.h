@@ -30,9 +30,9 @@ static NSString *NoticeAddressBookSubmited =@"address_book_submited";
 -(void)createUser;
 // POST api/v1/user
 
--(void)getMyBeat:(NSNumber *)userID;
+-(void)getMyBeat:(NSNumber *)userID score:(NSInteger)score_ ;
 // GET /user/<id>/beatrank
--(void)submitAddressbook:(NSMutableArray *)book withUserID:(NSNumber *)userID;
+//-(void)submitAddressbook:(NSMutableArray *)book withUserID:(NSNumber *)userID;
 -(void)submitScore:(NSInteger)score withUserID:(NSNumber *)userID;
 // PUT /api/v1.0/user/
 -(void)getFriendRankingWithLimit:(NSInteger)limit_;

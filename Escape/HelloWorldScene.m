@@ -14,7 +14,8 @@
 //#import "ShipWall.h"
 #import "ContactServer.h"
 
-#import <AddressBook/AddressBook.h>
+//#import <AddressBook/AddressBook.h>
+#import <Social/Social.h>
 
 // -----------------------------------------------------------------------
 #pragma mark - HelloWorldScene
@@ -70,6 +71,79 @@
     
     
 }
+-(void)initGameCoins
+{
+    NSNumber *coins =[[NSUserDefaults standardUserDefaults] objectForKey:kCoins];
+    
+    if (!coins) {
+        //first game
+        coins  = [NSNumber numberWithInteger:kFirstRunCoins];
+        [[NSUserDefaults standardUserDefaults] setObject:coins forKey:kCoins];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    
+    self.coinNum = [coins integerValue];
+    
+}
+-(UIImage*) screenshot:(CCNode*)scene
+{
+    [CCDirector sharedDirector].nextDeltaTimeZero = YES;
+    
+    CGSize viewSize = [[CCDirector sharedDirector] viewSize];
+    CCRenderTexture* rtx =
+    [CCRenderTexture renderTextureWithWidth:viewSize.width
+                                     height:viewSize.height];
+    [rtx begin];
+    [scene visit];
+    //[startNode.parent visit];
+    [rtx end];
+    
+    return [rtx getUIImage];
+}
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSLog(@"sheet index%ld",(long)buttonIndex);
+    id snsType = SLServiceTypeTwitter;
+    if (buttonIndex == 1) {
+        snsType = SLServiceTypeFacebook;
+    }else if(buttonIndex ==2 ){
+        snsType = SLServiceTypeSinaWeibo;
+    }
+
+    [self postToSNS:snsType];
+}
+-(void)popSNSActionSheet
+{
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Share to: "
+                                                    delegate:self
+                                              cancelButtonTitle:@"Cancel"
+                                         destructiveButtonTitle:nil
+                                              otherButtonTitles:@"Twtter",@"Facebook", @"微博",nil];
+    [sheet showInView:[CCDirector sharedDirector].view];
+}
+
+- (void)postToSNS:(id) snsType {
+    CCScene *scene = [[CCDirector sharedDirector] runningScene];
+    UIImage *img = [self screenshot:scene];
+    NSString *msg=[NSString stringWithFormat:@"I got %ld points at #EscapeOfDeathShip,beat %.F%% of other player! and you?",
+                   (long)_scoreNumber, self.beatrank ];
+    if (snsType == SLServiceTypeSinaWeibo) {
+        msg = [NSString stringWithFormat:@"我在《逃离死舰》中获得了%ld分！,打败了%.F%%的全世界其他玩家! 你呢?"
+               ,(long)_scoreNumber, self.beatrank ];
+        
+    }
+    if([SLComposeViewController isAvailableForServiceType:snsType]) {
+        SLComposeViewController *controller = [SLComposeViewController composeViewControllerForServiceType:snsType];
+        [controller addURL:[NSURL URLWithString:@"https://itunes.apple.com/cn/artist/figapps-studio/id394637868"]];
+
+        [controller addImage:img];
+
+        [controller setInitialText:msg];
+        [[CCDirector sharedDirector] presentViewController:controller animated:YES completion:Nil];
+        
+    }
+}
+
 -(void)screenFlash
 {
     if (_whiteScreen == nil) {
@@ -88,6 +162,54 @@
                                                               //action2,action3,action4,nil] times:2];
     [_whiteScreen runAction:[CCActionSequence actions:action1,
                              action2,action3,nil]];
+}
+-(void)insideCoin
+{
+    //1. play coin sound
+    [[OALSimpleAudio sharedInstance] playEffect:@"start.wav"];
+    
+    // . update coin laber
+    CCLabelBMFont *coinFont =(CCLabelBMFont *)[self getChildByName:@"coin-font" recursively:NO];
+    self.coinNum =self.coinNum -1;
+    
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:self.coinNum] forKey:kCoins];
+    [[NSUserDefaults standardUserDefaults] synchronize  ];
+    
+    [coinFont setString:[NSString stringWithFormat:@"%ld", (long)self.coinNum]];
+    
+    //2. coin anim
+    CCSprite *coin =(CCSprite*)[self getChildByName:@"coins" recursively:NO];
+    
+    //3. to get ready
+    NSMutableArray *frames = [NSMutableArray arrayWithCapacity:4];
+    CCSpriteFrame *frame = [CCSpriteFrame frameWithImageNamed:@"coin-anim0.png"];
+    [frame.texture setAntialiased:NO];
+
+    CCSpriteFrame *frame1 = [CCSpriteFrame frameWithImageNamed:@"coin-anim1.png"];
+    [frame1.texture setAntialiased:NO];
+    
+    CCSpriteFrame *frame2 = [CCSpriteFrame frameWithImageNamed:@"coin-anim2.png"];
+    [frame2.texture setAntialiased:NO];
+    
+    CCSpriteFrame *frame3 = [CCSpriteFrame frameWithImageNamed:@"coin-anim1.png"];
+    [frame3.texture setAntialiased:NO];
+    
+    [frames addObject:frame];
+    [frames addObject:frame1];
+    [frames addObject:frame2];
+    [frames addObject:frame3];
+    
+    CCAnimation *anim = [CCAnimation animationWithSpriteFrames:frames delay:0.2f];
+    
+    CCActionAnimate* animate = [CCActionAnimate actionWithAnimation:anim];
+    
+    CCActionCallFunc *coinMoveOver =[ CCActionCallFunc actionWithTarget:self
+                                                                 selector:@selector(getReady)];
+    
+    CCActionSequence *sequence = [CCActionSequence actions:animate,coinMoveOver, nil];
+    
+    [coin runAction:sequence];
+    
 }
 -(void)showGameHome
 {
@@ -120,7 +242,7 @@
     
     [replay setScale:kScaleRate];
     
-    [replay setTarget:self selector:@selector(getReady)];
+    [replay setTarget:self selector:@selector(insideCoin)];
     //rate
     CCSpriteFrame *rateFrame = [CCSpriteFrame frameWithImageNamed:@"btn-rate.png"];
     [rateFrame.texture setAntialiased:NO];
@@ -133,16 +255,25 @@
     
     
     
-//    //share
-//    CCSpriteFrame *shareFrame = [CCSpriteFrame frameWithImageNamed:@"btn-share.png"];
-//    [shareFrame.texture setAntialiased:NO];
-//    CCButton *share  = [CCButton buttonWithTitle:nil spriteFrame:shareFrame];
-//    
-//    share.position = ccp(replay.position.x  , board.position.y +16 - board.contentSize.height/2*kScaleRate + share.contentSize.height/2*kScaleRate );
-//    
-//    [share setScale:kScaleRate];
+    //ADD COIN
+    CCSpriteFrame *coinFrame =[CCSpriteFrame frameWithImageNamed:@"coin.png"];
+    CCSprite *coin = [CCSprite spriteWithSpriteFrame:coinFrame];
+    [coin.texture setAntialiased:NO];
+    [coin setScale:kScaleRate];
+    
+    coin.position = ccp(16 + coin.contentSize.width/2*kScaleRate,
+                        [CCDirector sharedDirector].viewSize.height -16 -coin.contentSize.height/2*kScaleRate);
+    [self addChild:coin z:kZIndexUI name:@"coins"];
     
     
+    CCLabelBMFont *coinFont = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"%ld",(long)self.coinNum] fntFile:@"msss-export.fnt"];
+    [coinFont.texture setAntialiased:NO];
+    
+    coinFont.position = ccp(44 + coinFont.contentSize.width/2*kScaleRate,
+                        [CCDirector sharedDirector].viewSize.height -14 -coinFont.contentSize.height/2*kScaleRate);
+    [coinFont setScale:kScaleRate];
+    
+    [self addChild:coinFont z:kZIndexUI name:@"coin-font"];
     
     //lb-title
     CCSpriteFrame *titleFrame = [CCSpriteFrame frameWithImageNamed:@"home-title.png"];
@@ -176,152 +307,152 @@
 
  
 }
--(void)readAllContacts
-{
-    NSMutableArray *book = [NSMutableArray array];
-    
-    CFErrorRef *error = NULL;
-    ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, error);
-    CFArrayRef allPeople = ABAddressBookCopyArrayOfAllPeople(addressBook);
-    CFIndex numberOfPeople = ABAddressBookGetPersonCount(addressBook);
-    
-    for(int i = 0; i < numberOfPeople; i++) {
-        
-        NSMutableArray *emails = [NSMutableArray array];
-        NSMutableArray *phones = [NSMutableArray array];
-        
-        ABRecordRef person = CFArrayGetValueAtIndex( allPeople, i );
-        
-        NSString *firstName = (__bridge NSString *)(ABRecordCopyValue(person, kABPersonFirstNameProperty));
-        NSString *lastName = (__bridge NSString *)(ABRecordCopyValue(person, kABPersonLastNameProperty));
-    
-   
-        NSLog(@"Name:%@ %@", firstName, lastName);
-        
-        
-        ABMultiValueRef phoneNumbers = ABRecordCopyValue(person, kABPersonPhoneProperty);
-        ABMultiValueRef email = ABRecordCopyValue(person, kABPersonEmailProperty);
-        for (CFIndex i = 0; i < ABMultiValueGetCount(email); i++) {
-            NSString *emailAddress = (__bridge_transfer NSString *) ABMultiValueCopyValueAtIndex(email, i);
-            NSLog(@"email:%@", emailAddress);
-            [emails addObject:emailAddress];
-        }
-        
-        for (CFIndex i = 0; i < ABMultiValueGetCount(phoneNumbers); i++) {
-            NSString *phoneNumber = (__bridge_transfer NSString *) ABMultiValueCopyValueAtIndex(phoneNumbers, i);
-            NSLog(@"phone:%@", phoneNumber);
-            [phones addObject:phoneNumber];
-            
-        }
-        
-        [book addObject:@{@"first_name":firstName, @"last_name":lastName,@"emails":emails,@"phone_numbers":phones }];
-        
-        NSLog(@"=============================================");
-        
-    }
-    [self.connServer submitAddressbook:book withUserID:self.cherryID];
-    
-    
-}
--(void) connAddressBook
-{
-    if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusDenied ||
-        ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusRestricted){
-        //1
-        NSLog(@"Denied");
-    } else if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized){
-        //2
-        NSLog(@"Authorized");
-        [self readAllContacts];
-    } else{ //ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusNotDetermined
-        //3
-        ABAddressBookRequestAccessWithCompletion(ABAddressBookCreateWithOptions(NULL, nil), ^(bool granted, CFErrorRef error) {
-            if (!granted){
-                //4
-                NSLog(@"Just denied");
-                return;
-            }
-            //5
-            NSLog(@"Just authorized");
-        });
-    }
-    
-}
--(void)fbUploadUserInfo
-{
-    [FBRequestConnection startForMeWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
-        if (!error) {
-            // Success! Include your code to handle the results here
-            NSLog(@"user info: %@", result);
-            /*
-             user info: {
-             email = "david.zen.2007@gmail.com";
-             "first_name" = David;
-             id = 10152356455103843;
-             "last_name" = Tsang;
-             link = "https://www.facebook.com/app_scoped_user_id/10152356455103843/";
-             locale = "en_US";
-             name = "David Tsang";
-             timezone = 8;
-             "updated_time" = "2014-08-03T08:18:18+0000";
-             verified = 1;
-             }
-
-             */
-        } else {
-            // An error occurred, we need to handle the error
-            // See: https://developers.facebook.com/docs/ios/errors
-        }
-    }];
-    
-    /* make the API call */
-    [FBRequestConnection startWithGraphPath:@"/me/friends"
-                                 parameters:nil
-                                 HTTPMethod:@"GET"
-                          completionHandler:^(
-                                              FBRequestConnection *connection,
-                                              id result,
-                                              NSError *error
-                                              ) {
-                              /* handle the result */
-                              NSLog(@"user info: %@", result);
-                          }];
-}
--(void)fbLogin
-{
-    // If the session state is any of the two "open" states when the button is clicked
-    if (FBSession.activeSession.state == FBSessionStateOpen
-        || FBSession.activeSession.state == FBSessionStateOpenTokenExtended) {
-        
-        // Close the session and remove the access token from the cache
-        // The session state handler (in the app delegate) will be called automatically
-        [FBSession.activeSession closeAndClearTokenInformation];
-        
-        // If the session state is not any of the two "open" states when the button is clicked
-    } else {
-        // Open a session showing the user the login UI
-        // You must ALWAYS ask for public_profile permissions when opening a session
-        [FBSession openActiveSessionWithReadPermissions:@[@"public_profile",@"email",@"user_friends"]
-                                           allowLoginUI:YES
-                                      completionHandler:
-         ^(FBSession *session, FBSessionState state, NSError *error) {
-             
-             // Retrieve the app delegate
-             AppDelegate* appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-             // Call the app delegate's sessionStateChanged:state:error method to handle session state changes
-             [appDelegate sessionStateChanged:session state:state error:error];
-             NSLog(@"fb login event! here %@", appDelegate.fbSessionState  );
-             
-             if (appDelegate.fbSessionState == iFBSessionOpened)
-             {
-                 //read user info, email, friend
-                 [self fbUploadUserInfo];
-                 
-             }
-         }];
-
-    }
-}
+//-(void)readAllContacts
+//{
+//    NSMutableArray *book = [NSMutableArray array];
+//    
+//    CFErrorRef *error = NULL;
+//    ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, error);
+//    CFArrayRef allPeople = ABAddressBookCopyArrayOfAllPeople(addressBook);
+//    CFIndex numberOfPeople = ABAddressBookGetPersonCount(addressBook);
+//    
+//    for(int i = 0; i < numberOfPeople; i++) {
+//        
+//        NSMutableArray *emails = [NSMutableArray array];
+//        NSMutableArray *phones = [NSMutableArray array];
+//        
+//        ABRecordRef person = CFArrayGetValueAtIndex( allPeople, i );
+//        
+//        NSString *firstName = (__bridge NSString *)(ABRecordCopyValue(person, kABPersonFirstNameProperty));
+//        NSString *lastName = (__bridge NSString *)(ABRecordCopyValue(person, kABPersonLastNameProperty));
+//    
+//   
+//        NSLog(@"Name:%@ %@", firstName, lastName);
+//        
+//        
+//        ABMultiValueRef phoneNumbers = ABRecordCopyValue(person, kABPersonPhoneProperty);
+//        ABMultiValueRef email = ABRecordCopyValue(person, kABPersonEmailProperty);
+//        for (CFIndex i = 0; i < ABMultiValueGetCount(email); i++) {
+//            NSString *emailAddress = (__bridge_transfer NSString *) ABMultiValueCopyValueAtIndex(email, i);
+//            NSLog(@"email:%@", emailAddress);
+//            [emails addObject:emailAddress];
+//        }
+//        
+//        for (CFIndex i = 0; i < ABMultiValueGetCount(phoneNumbers); i++) {
+//            NSString *phoneNumber = (__bridge_transfer NSString *) ABMultiValueCopyValueAtIndex(phoneNumbers, i);
+//            NSLog(@"phone:%@", phoneNumber);
+//            [phones addObject:phoneNumber];
+//            
+//        }
+//        
+//        [book addObject:@{@"first_name":firstName, @"last_name":lastName,@"emails":emails,@"phone_numbers":phones }];
+//        
+//        NSLog(@"=============================================");
+//        
+//    }
+//    [self.connServer submitAddressbook:book withUserID:self.cherryID];
+//    
+//    
+//}
+//-(void) connAddressBook
+//{
+//    if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusDenied ||
+//        ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusRestricted){
+//        //1
+//        NSLog(@"Denied");
+//    } else if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized){
+//        //2
+//        NSLog(@"Authorized");
+//        [self readAllContacts];
+//    } else{ //ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusNotDetermined
+//        //3
+//        ABAddressBookRequestAccessWithCompletion(ABAddressBookCreateWithOptions(NULL, nil), ^(bool granted, CFErrorRef error) {
+//            if (!granted){
+//                //4
+//                NSLog(@"Just denied");
+//                return;
+//            }
+//            //5
+//            NSLog(@"Just authorized");
+//        });
+//    }
+//    
+//}
+//-(void)fbUploadUserInfo
+//{
+//    [FBRequestConnection startForMeWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+//        if (!error) {
+//            // Success! Include your code to handle the results here
+//            NSLog(@"user info: %@", result);
+//            /*
+//             user info: {
+//             email = "david.zen.2007@gmail.com";
+//             "first_name" = David;
+//             id = 10152356455103843;
+//             "last_name" = Tsang;
+//             link = "https://www.facebook.com/app_scoped_user_id/10152356455103843/";
+//             locale = "en_US";
+//             name = "David Tsang";
+//             timezone = 8;
+//             "updated_time" = "2014-08-03T08:18:18+0000";
+//             verified = 1;
+//             }
+//
+//             */
+//        } else {
+//            // An error occurred, we need to handle the error
+//            // See: https://developers.facebook.com/docs/ios/errors
+//        }
+//    }];
+//    
+//    /* make the API call */
+//    [FBRequestConnection startWithGraphPath:@"/me/friends"
+//                                 parameters:nil
+//                                 HTTPMethod:@"GET"
+//                          completionHandler:^(
+//                                              FBRequestConnection *connection,
+//                                              id result,
+//                                              NSError *error
+//                                              ) {
+//                              /* handle the result */
+//                              NSLog(@"user info: %@", result);
+//                          }];
+//}
+//-(void)fbLogin
+//{
+//    // If the session state is any of the two "open" states when the button is clicked
+//    if (FBSession.activeSession.state == FBSessionStateOpen
+//        || FBSession.activeSession.state == FBSessionStateOpenTokenExtended) {
+//        
+//        // Close the session and remove the access token from the cache
+//        // The session state handler (in the app delegate) will be called automatically
+//        [FBSession.activeSession closeAndClearTokenInformation];
+//        
+//        // If the session state is not any of the two "open" states when the button is clicked
+//    } else {
+//        // Open a session showing the user the login UI
+//        // You must ALWAYS ask for public_profile permissions when opening a session
+//        [FBSession openActiveSessionWithReadPermissions:@[@"public_profile",@"email",@"user_friends"]
+//                                           allowLoginUI:YES
+//                                      completionHandler:
+//         ^(FBSession *session, FBSessionState state, NSError *error) {
+//             
+//             // Retrieve the app delegate
+//             AppDelegate* appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+//             // Call the app delegate's sessionStateChanged:state:error method to handle session state changes
+//             [appDelegate sessionStateChanged:session state:state error:error];
+//             NSLog(@"fb login event! here %@", appDelegate.fbSessionState  );
+//             
+//             if (appDelegate.fbSessionState == iFBSessionOpened)
+//             {
+//                 //read user info, email, friend
+//                 [self fbUploadUserInfo];
+//                 
+//             }
+//         }];
+//
+//    }
+//}
 -(void)showGameOver
 {
     self.sceneType = kSceneGameOver;
@@ -354,7 +485,7 @@
     
     [replay setScale:kScaleRate];
     
-    [replay setTarget:self selector:@selector(getReady)];
+    [replay setTarget:self selector:@selector(insideCoin)];
     //rate
     CCSpriteFrame *rateFrame = [CCSpriteFrame frameWithImageNamed:@"btn-rate.png"];
     [rateFrame.texture setAntialiased:NO];
@@ -382,7 +513,7 @@
     CCSpriteFrame *shareFrame = [CCSpriteFrame frameWithImageNamed:@"btn-share.png"];
     [shareFrame.texture setAntialiased:NO];
     CCButton *share  = [CCButton buttonWithTitle:nil spriteFrame:shareFrame];
-    
+    [share setTarget:self selector:@selector(popSNSActionSheet)];
     share.position = ccp(replay.position.x  , board.position.y +16 - board.contentSize.height/2*kScaleRate + share.contentSize.height/2*kScaleRate );
     
     [share setScale:kScaleRate];
@@ -401,6 +532,26 @@
     
 
     
+    //ADD COIN
+    CCSpriteFrame *coinFrame =[CCSpriteFrame frameWithImageNamed:@"coin.png"];
+    CCSprite *coin = [CCSprite spriteWithSpriteFrame:coinFrame];
+    [coin.texture setAntialiased:NO];
+    [coin setScale:kScaleRate];
+    
+    coin.position = ccp(16 + coin.contentSize.width/2*kScaleRate,
+                        [CCDirector sharedDirector].viewSize.height -16 -coin.contentSize.height/2*kScaleRate);
+    [self addChild:coin z:kZIndexUI name:@"coins"];
+    
+    
+    CCLabelBMFont *coinFont = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"%ld",(long)self.coinNum] fntFile:@"msss-export.fnt"];
+    [coinFont.texture setAntialiased:NO];
+    
+    coinFont.position = ccp(44 + coinFont.contentSize.width/2*kScaleRate,
+                            [CCDirector sharedDirector].viewSize.height -14 -coinFont.contentSize.height/2*kScaleRate);
+    [coinFont setScale:kScaleRate];
+    
+    [self addChild:coinFont z:kZIndexUI name:@"coin-font"];
+
     
     //score
     if (_gameOverScore == nil) {
@@ -452,7 +603,7 @@
     if (_scoreNumber >= 10) {
         
         if (showBeatrank == NO) {
-            [self.connServer getMyBeat:self.cherryID];
+            [self.connServer getMyBeat:self.cherryID score:_scoreNumber];
         }
         
         NSString *medalFile = @"medal3.png";
@@ -1282,6 +1433,8 @@
     ContactServer *connSrv = [[ContactServer alloc] init];
     self.connServer = connSrv;
     
+    [self initGameCoins];
+    
     //get cherry id
     self.cherryIDSafeStore = [[KeychainItemWrapper alloc] initWithIdentifier:@"cherry_board_id" accessGroup:nil];
     //[self.cherryIDSafeStore re];
@@ -1316,7 +1469,6 @@
  
     
     // done
-    
 
 	
     //score
@@ -1343,7 +1495,7 @@
 
 -(void)scoreSubmited:(NSNotification *)note
 {
-    [self.connServer getMyBeat:self.cherryID];
+    [self.connServer getMyBeat:self.cherryID score:_scoreNumber];
 }
 -(void)gotBeatrank:(NSNotification *)note
 {
@@ -1428,7 +1580,7 @@
 }
 -(void)getReady
 {
-    [[OALSimpleAudio sharedInstance] playEffect:@"start.wav"];
+    
     CCScene *currentScene = [CCDirector sharedDirector].runningScene;
     HelloWorldScene *newScene = [[[currentScene class] alloc] init];
     [newScene showGetReady];

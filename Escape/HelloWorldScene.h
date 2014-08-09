@@ -11,10 +11,12 @@
 #import "cocos2d.h"
 #import "cocos2d-ui.h"
 #import "KeychainItemWrapper.h"
-#import <FacebookSDK/FacebookSDK.h>
+//#import <FacebookSDK/FacebookSDK.h>
 
 
 static NSString *KeyHighScore = @"high_score";
+static NSString *kCoins =@"game_coins";
+
 // -----------------------------------------------------------------------
 
 #define kSceneHome 20
@@ -24,10 +26,12 @@ static NSString *KeyHighScore = @"high_score";
 /**
  *  The main scene
  */
+#define kFirstRunCoins 50
 
 @class  ContactServer;
 
 @interface HelloWorldScene : CCScene
+<UIActionSheetDelegate>
 {
     CCActionRepeatForever *_fightRepeat;
     BOOL _isGemeOver;
@@ -41,7 +45,7 @@ static NSString *KeyHighScore = @"high_score";
 @property(nonatomic,strong)NSNumber *worldHiscore;
 @property(nonatomic,assign)float beatrank;
 @property(nonatomic,strong)ContactServer *connServer;
-
+@property(nonatomic,assign)NSInteger coinNum;
 + (HelloWorldScene *)scene;
 - (id)init;
 
