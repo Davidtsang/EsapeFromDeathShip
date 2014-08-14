@@ -35,6 +35,6 @@ static NSString *NoticeAddressBookSubmited =@"address_book_submited";
 //-(void)submitAddressbook:(NSMutableArray *)book withUserID:(NSNumber *)userID;
 -(void)submitScore:(NSInteger)score withUserID:(NSNumber *)userID;
 // PUT /api/v1.0/user/
--(void)getFriendRankingWithLimit:(NSInteger)limit_;
+//-(void)getFriendRankingWithLimit:(NSInteger)limit_;
 
 @end

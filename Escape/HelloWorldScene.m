@@ -8,13 +8,9 @@
 // -----------------------------------------------------------------------
 
 #import "HelloWorldScene.h"
-#import "AppDelegate.h"
-
+ 
 #import "CCAnimation.h"
-//#import "ShipWall.h"
 #import "ContactServer.h"
-
-//#import <AddressBook/AddressBook.h>
 #import <Social/Social.h>
 
 // -----------------------------------------------------------------------
@@ -25,6 +21,8 @@
 
 @implementation HelloWorldScene
 {
+    
+    
     CCSprite *_spaceFight;
     CCNode *_deathshipFloor1;
     CCNode *_deathshipFloor2;
@@ -71,6 +69,29 @@
     
     
 }
+
+-(void)restoreIAP
+{
+    [[ThisIAPHelper sharedInstance] restoreCompletedTransactions];
+}
+-(void)rateApp
+{
+    NSString* url = [NSString stringWithFormat: @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%@", kMyAppID];
+    //NSLog(@"Begin rate url");
+    [[UIApplication sharedApplication] openURL: [NSURL URLWithString: url]];
+    
+}
+-(void)showRanking
+{
+    [[GameKitHelper sharedInstance] retrieveTop100AllTimeGlobalScores];
+}
+//iap
+
+-(void)upgradeToPro
+{
+    NSLog(@"upgrade to pro....");
+    [[ThisIAPHelper sharedInstance] buyRemoveAds];
+}
 -(void)initGameCoins
 {
     NSNumber *coins =[[NSUserDefaults standardUserDefaults] objectForKey:kCoins];
@@ -109,8 +130,10 @@
     }else if(buttonIndex ==2 ){
         snsType = SLServiceTypeSinaWeibo;
     }
-
-    [self postToSNS:snsType];
+    if (buttonIndex !=3 ) {
+        [self postToSNS:snsType];
+    }
+    
 }
 -(void)popSNSActionSheet
 {
@@ -134,7 +157,7 @@
     }
     if([SLComposeViewController isAvailableForServiceType:snsType]) {
         SLComposeViewController *controller = [SLComposeViewController composeViewControllerForServiceType:snsType];
-        [controller addURL:[NSURL URLWithString:@"https://itunes.apple.com/cn/artist/figapps-studio/id394637868"]];
+        [controller addURL:[NSURL URLWithString:kAPPStroeURL]];
 
         [controller addImage:img];
 
@@ -163,54 +186,54 @@
     [_whiteScreen runAction:[CCActionSequence actions:action1,
                              action2,action3,nil]];
 }
--(void)insideCoin
-{
-    //1. play coin sound
-    [[OALSimpleAudio sharedInstance] playEffect:@"start.wav"];
-    
-    // . update coin laber
-    CCLabelBMFont *coinFont =(CCLabelBMFont *)[self getChildByName:@"coin-font" recursively:NO];
-    self.coinNum =self.coinNum -1;
-    
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:self.coinNum] forKey:kCoins];
-    [[NSUserDefaults standardUserDefaults] synchronize  ];
-    
-    [coinFont setString:[NSString stringWithFormat:@"%ld", (long)self.coinNum]];
-    
-    //2. coin anim
-    CCSprite *coin =(CCSprite*)[self getChildByName:@"coins" recursively:NO];
-    
-    //3. to get ready
-    NSMutableArray *frames = [NSMutableArray arrayWithCapacity:4];
-    CCSpriteFrame *frame = [CCSpriteFrame frameWithImageNamed:@"coin-anim0.png"];
-    [frame.texture setAntialiased:NO];
-
-    CCSpriteFrame *frame1 = [CCSpriteFrame frameWithImageNamed:@"coin-anim1.png"];
-    [frame1.texture setAntialiased:NO];
-    
-    CCSpriteFrame *frame2 = [CCSpriteFrame frameWithImageNamed:@"coin-anim2.png"];
-    [frame2.texture setAntialiased:NO];
-    
-    CCSpriteFrame *frame3 = [CCSpriteFrame frameWithImageNamed:@"coin-anim1.png"];
-    [frame3.texture setAntialiased:NO];
-    
-    [frames addObject:frame];
-    [frames addObject:frame1];
-    [frames addObject:frame2];
-    [frames addObject:frame3];
-    
-    CCAnimation *anim = [CCAnimation animationWithSpriteFrames:frames delay:0.2f];
-    
-    CCActionAnimate* animate = [CCActionAnimate actionWithAnimation:anim];
-    
-    CCActionCallFunc *coinMoveOver =[ CCActionCallFunc actionWithTarget:self
-                                                                 selector:@selector(getReady)];
-    
-    CCActionSequence *sequence = [CCActionSequence actions:animate,coinMoveOver, nil];
-    
-    [coin runAction:sequence];
-    
-}
+//-(void)insideCoin
+//{
+//    //1. play coin sound
+//    [[OALSimpleAudio sharedInstance] playEffect:@"start.wav"];
+//    
+//    // . update coin laber
+//    CCLabelBMFont *coinFont =(CCLabelBMFont *)[self getChildByName:@"coin-font" recursively:NO];
+//    self.coinNum =self.coinNum -1;
+//    
+//    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:self.coinNum] forKey:kCoins];
+//    [[NSUserDefaults standardUserDefaults] synchronize  ];
+//    
+//    [coinFont setString:[NSString stringWithFormat:@"%ld", (long)self.coinNum]];
+//    
+//    //2. coin anim
+//    CCSprite *coin =(CCSprite*)[self getChildByName:@"coins" recursively:NO];
+//    
+//    //3. to get ready
+//    NSMutableArray *frames = [NSMutableArray arrayWithCapacity:4];
+//    CCSpriteFrame *frame = [CCSpriteFrame frameWithImageNamed:@"coin-anim0.png"];
+//    [frame.texture setAntialiased:NO];
+//
+//    CCSpriteFrame *frame1 = [CCSpriteFrame frameWithImageNamed:@"coin-anim1.png"];
+//    [frame1.texture setAntialiased:NO];
+//    
+//    CCSpriteFrame *frame2 = [CCSpriteFrame frameWithImageNamed:@"coin-anim2.png"];
+//    [frame2.texture setAntialiased:NO];
+//    
+//    CCSpriteFrame *frame3 = [CCSpriteFrame frameWithImageNamed:@"coin-anim1.png"];
+//    [frame3.texture setAntialiased:NO];
+//    
+//    [frames addObject:frame];
+//    [frames addObject:frame1];
+//    [frames addObject:frame2];
+//    [frames addObject:frame3];
+//    
+//    CCAnimation *anim = [CCAnimation animationWithSpriteFrames:frames delay:0.2f];
+//    
+//    CCActionAnimate* animate = [CCActionAnimate actionWithAnimation:anim];
+//    
+//    CCActionCallFunc *coinMoveOver =[ CCActionCallFunc actionWithTarget:self
+//                                                                 selector:@selector(getReady)];
+//    
+//    CCActionSequence *sequence = [CCActionSequence actions:animate,coinMoveOver, nil];
+//    
+//    [coin runAction:sequence];
+//    
+//}
 -(void)showGameHome
 {
     //CCButton *ranking = [CCButton b]
@@ -221,7 +244,7 @@
     
     
     ranking.position = ccp(32 + ranking.contentSize.width/2*kScaleRate, 32 +ranking.contentSize.height/2*kScaleRate );
-    [ranking setTarget:self selector:@selector(connAddressBook)];
+    [ranking setTarget:self selector:@selector(showRanking)];
     [ranking setScale:kScaleRate];
     
     if (_gameHome == nil) {
@@ -242,7 +265,9 @@
     
     [replay setScale:kScaleRate];
     
-    [replay setTarget:self selector:@selector(insideCoin)];
+    [replay setTarget:self selector:@selector(getReady)];
+    
+    
     //rate
     CCSpriteFrame *rateFrame = [CCSpriteFrame frameWithImageNamed:@"btn-rate.png"];
     [rateFrame.texture setAntialiased:NO];
@@ -253,27 +278,28 @@
     
     [rate setScale:kScaleRate];
     
+    [rate setTarget:self selector:@selector(rateApp)];
     
-    
-    //ADD COIN
-    CCSpriteFrame *coinFrame =[CCSpriteFrame frameWithImageNamed:@"coin.png"];
-    CCSprite *coin = [CCSprite spriteWithSpriteFrame:coinFrame];
-    [coin.texture setAntialiased:NO];
-    [coin setScale:kScaleRate];
-    
-    coin.position = ccp(16 + coin.contentSize.width/2*kScaleRate,
-                        [CCDirector sharedDirector].viewSize.height -16 -coin.contentSize.height/2*kScaleRate);
-    [self addChild:coin z:kZIndexUI name:@"coins"];
-    
-    
-    CCLabelBMFont *coinFont = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"%ld",(long)self.coinNum] fntFile:@"msss-export.fnt"];
-    [coinFont.texture setAntialiased:NO];
-    
-    coinFont.position = ccp(44 + coinFont.contentSize.width/2*kScaleRate,
-                        [CCDirector sharedDirector].viewSize.height -14 -coinFont.contentSize.height/2*kScaleRate);
-    [coinFont setScale:kScaleRate];
-    
-    [self addChild:coinFont z:kZIndexUI name:@"coin-font"];
+
+//    //ADD COIN
+//    CCSpriteFrame *coinFrame =[CCSpriteFrame frameWithImageNamed:@"coin.png"];
+//    CCSprite *coin = [CCSprite spriteWithSpriteFrame:coinFrame];
+//    [coin.texture setAntialiased:NO];
+//    [coin setScale:kScaleRate];
+//    
+//    coin.position = ccp(16 + coin.contentSize.width/2*kScaleRate,
+//                        [CCDirector sharedDirector].viewSize.height -16 -coin.contentSize.height/2*kScaleRate);
+//    [self addChild:coin z:kZIndexUI name:@"coins"];
+//    
+//    
+//    CCLabelBMFont *coinFont = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"%ld",(long)self.coinNum] fntFile:@"msss-export.fnt"];
+//    [coinFont.texture setAntialiased:NO];
+//    
+//    coinFont.position = ccp(44 + coinFont.contentSize.width/2*kScaleRate,
+//                        [CCDirector sharedDirector].viewSize.height -14 -coinFont.contentSize.height/2*kScaleRate);
+//    [coinFont setScale:kScaleRate];
+//    
+//    [self addChild:coinFont z:kZIndexUI name:@"coin-font"];
     
     //lb-title
     CCSpriteFrame *titleFrame = [CCSpriteFrame frameWithImageNamed:@"home-title.png"];
@@ -284,6 +310,19 @@
                          title.contentSize.height/2*kScaleRate );
     
     [title setScale:kScaleRate];
+    
+    
+    //restore
+    CCSpriteFrame *restoreFrame = [CCSpriteFrame frameWithImageNamed:@"btn-restore.png"];
+    [restoreFrame.texture setAntialiased:NO];
+    CCButton *restore  = [CCButton buttonWithTitle:nil spriteFrame:restoreFrame];
+    
+    
+    restore.position = ccp(replay.position.x , title.position.y - title.contentSize.height/2*kScaleRate - restore.contentSize.height/2*kScaleRate - 16  );
+    
+    [restore setScale:kScaleRate];
+    
+    [restore setTarget:self selector:@selector(restoreIAP)];
     
     
     //cpright
@@ -300,6 +339,7 @@
     
     [_gameHome addChild:title];
     [_gameHome addChild:copyright];
+     [_gameHome addChild:restore];
     
     
     [self addChild:_gameHome z:kZIndexUI];
@@ -465,6 +505,8 @@
     
     ranking.position = ccp(32 + ranking.contentSize.width/2*kScaleRate, 32 +ranking.contentSize.height/2*kScaleRate );
     
+    [ranking setTarget:self selector:@selector(showRanking)];
+    
     [ranking setScale:kScaleRate];
     
     if (_gameOver == nil) {
@@ -485,12 +527,13 @@
     
     [replay setScale:kScaleRate];
     
-    [replay setTarget:self selector:@selector(insideCoin)];
+    [replay setTarget:self selector:@selector(getReady)];
+    
     //rate
     CCSpriteFrame *rateFrame = [CCSpriteFrame frameWithImageNamed:@"btn-rate.png"];
     [rateFrame.texture setAntialiased:NO];
     CCButton *rate  = [CCButton buttonWithTitle:nil spriteFrame:rateFrame];
-    [rate setTarget:self selector:@selector(fbLogin)];
+    [rate setTarget:self selector:@selector(rateApp)];
     
     rate.position = ccp(replay.position.x +replay.contentSize.width/2*kScaleRate + 16 + rate.contentSize.width/2*kScaleRate, ranking.position.y  );
     
@@ -509,15 +552,55 @@
     
     [board setScale:kScaleRate];
     
-    //share
+    //share or upgrade
     CCSpriteFrame *shareFrame = [CCSpriteFrame frameWithImageNamed:@"btn-share.png"];
+    if (_scoreNumber < kScoreSubmitLine ) {
+        shareFrame = [CCSpriteFrame frameWithImageNamed:@"btn-remove-ads.png"];
+    }
+    
     [shareFrame.texture setAntialiased:NO];
     CCButton *share  = [CCButton buttonWithTitle:nil spriteFrame:shareFrame];
-    [share setTarget:self selector:@selector(popSNSActionSheet)];
+    
+    if (_scoreNumber < kScoreSubmitLine) {
+        [share setTarget:self selector:@selector(upgradeToPro)];
+    }else{
+        [share setTarget:self selector:@selector(popSNSActionSheet)];
+        
+        //submit to game center
+        GameKitHelper *gkHelper = [GameKitHelper sharedInstance];
+        if (gkHelper.isUserLogined) {
+
+            [gkHelper submitScore:_scoreNumber category:kMainLeaderBoardID];
+            if ([gkHelper.userCountryCode isEqualToString:@"US"]) {
+                [gkHelper submitScore:_scoreNumber category:kLeaderBoardUSA];
+            }
+            if ([gkHelper.userCountryCode isEqualToString:@"CN"]) {
+                [gkHelper submitScore:_scoreNumber category:KLeaderBoardChina];
+            }
+            if ([gkHelper.userCountryCode isEqualToString:@"DE"]) {
+                [gkHelper submitScore:_scoreNumber category:KLeaderBoardGermany];
+            }
+            if ([gkHelper.userCountryCode isEqualToString:@"GB"]) {
+                [gkHelper submitScore:_scoreNumber category:KLeaderBoardUK];
+            }
+            if ([gkHelper.userCountryCode isEqualToString:@"JP"]) {
+                [gkHelper submitScore:_scoreNumber category:KLeaderBoardJapan];
+            }
+            if ([gkHelper.userCountryCode isEqualToString:@"KR"]) {
+                [gkHelper submitScore:_scoreNumber category:KLeaderBoardKorea];
+            }
+            if ([gkHelper.userCountryCode isEqualToString:@"AU"]) {
+                [gkHelper submitScore:_scoreNumber category:KLeaderBoardAustralia];
+            }
+        }
+        
+        
+    }
+    
     share.position = ccp(replay.position.x  , board.position.y +16 - board.contentSize.height/2*kScaleRate + share.contentSize.height/2*kScaleRate );
     
     [share setScale:kScaleRate];
-    
+  
     //lb-title
     CCSpriteFrame *titleFrame = [CCSpriteFrame frameWithImageNamed:@"lb-gameover.png"];
     [titleFrame.texture setAntialiased:NO];
@@ -532,25 +615,25 @@
     
 
     
-    //ADD COIN
-    CCSpriteFrame *coinFrame =[CCSpriteFrame frameWithImageNamed:@"coin.png"];
-    CCSprite *coin = [CCSprite spriteWithSpriteFrame:coinFrame];
-    [coin.texture setAntialiased:NO];
-    [coin setScale:kScaleRate];
-    
-    coin.position = ccp(16 + coin.contentSize.width/2*kScaleRate,
-                        [CCDirector sharedDirector].viewSize.height -16 -coin.contentSize.height/2*kScaleRate);
-    [self addChild:coin z:kZIndexUI name:@"coins"];
-    
-    
-    CCLabelBMFont *coinFont = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"%ld",(long)self.coinNum] fntFile:@"msss-export.fnt"];
-    [coinFont.texture setAntialiased:NO];
-    
-    coinFont.position = ccp(44 + coinFont.contentSize.width/2*kScaleRate,
-                            [CCDirector sharedDirector].viewSize.height -14 -coinFont.contentSize.height/2*kScaleRate);
-    [coinFont setScale:kScaleRate];
-    
-    [self addChild:coinFont z:kZIndexUI name:@"coin-font"];
+//    //ADD COIN
+//    CCSpriteFrame *coinFrame =[CCSpriteFrame frameWithImageNamed:@"coin.png"];
+//    CCSprite *coin = [CCSprite spriteWithSpriteFrame:coinFrame];
+//    [coin.texture setAntialiased:NO];
+//    [coin setScale:kScaleRate];
+//    
+//    coin.position = ccp(16 + coin.contentSize.width/2*kScaleRate,
+//                        [CCDirector sharedDirector].viewSize.height -16 -coin.contentSize.height/2*kScaleRate);
+//    [self addChild:coin z:kZIndexUI name:@"coins"];
+//    
+//    
+//    CCLabelBMFont *coinFont = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"%ld",(long)self.coinNum] fntFile:@"msss-export.fnt"];
+//    [coinFont.texture setAntialiased:NO];
+//    
+//    coinFont.position = ccp(44 + coinFont.contentSize.width/2*kScaleRate,
+//                            [CCDirector sharedDirector].viewSize.height -14 -coinFont.contentSize.height/2*kScaleRate);
+//    [coinFont setScale:kScaleRate];
+//    
+//    [self addChild:coinFont z:kZIndexUI name:@"coin-font"];
 
     
     //score
@@ -558,6 +641,7 @@
         _gameOverScore = [CCLabelBMFont labelWithString:@"0" fntFile:@"big-pixel-export.fnt"];
         
     }
+    
     [_gameOverScore.texture setAntialiased:NO];
     _gameOverScore.anchorPoint = ccp(1.0f,0.5f);
     _gameOverScore.position = ccp(replay.position.x +board.contentSize.width/2*kScaleRate-16, board.position.y + board.contentSize.height/2*kScaleRate - _gameOverScore.contentSize.height/2 -32);
@@ -580,8 +664,7 @@
     
     
     //medal 50 -> 3 ,100 > 2, 200 gold
-    
-        [_gameOver addChild:ranking];
+    [_gameOver addChild:ranking];
     [_gameOver addChild:replay];
     [_gameOver addChild:rate];
     [_gameOver addChild:board];
@@ -592,15 +675,16 @@
     [_gameOver addChild:highScore];
     
     BOOL showBeatrank = NO;
+
     if (_isNewBest) {
         showBeatrank = YES;
-        //[self.connServer getMyBeat:self.cherryID ];
+  
         [self.connServer submitScore:_scoreNumber withUserID:self.cherryID];
         [_gameOver addChild:newLable];
     }
     
     
-    if (_scoreNumber >= 10) {
+    if (_scoreNumber >= 25) {
         
         if (showBeatrank == NO) {
             [self.connServer getMyBeat:self.cherryID score:_scoreNumber];
@@ -644,10 +728,10 @@
     
     //beatrank
     
-        //run action
+    //run action
     CCActionMoveTo *mv = [CCActionMoveTo actionWithDuration:0.5 position:ccp(0, 0)];
     [_gameOver runAction:mv];
-    
+  
     
     
     //score action
@@ -728,6 +812,8 @@
 
 -(void)startGame
 {
+    [_appDelegate hideBannerView];
+    
     self.sceneType = kSceneGameing;
     
     //remove grd title
@@ -1344,7 +1430,7 @@
 }
 -(void ) gameOver
 {
-    
+    [_appDelegate showBannerView];
     [self removeChildByName:@"space-fight" cleanup:YES];
     [[OALSimpleAudio sharedInstance] playEffect:@"explosion.wav"];
     //[[CCDirector sharedDirector] pause];
@@ -1429,19 +1515,16 @@
     self.worldHiscore = nil;
     
     _isGemeOver = NO;
-    
+    _appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     ContactServer *connSrv = [[ContactServer alloc] init];
     self.connServer = connSrv;
     
-    [self initGameCoins];
+    //[self initGameCoins];
     
     //get cherry id
-    self.cherryIDSafeStore = [[KeychainItemWrapper alloc] initWithIdentifier:@"cherry_board_id" accessGroup:nil];
-    //[self.cherryIDSafeStore re];
+
     
-    //[self.cherryIDSafeStore setObject:[NSNumber numberWithInt:-1] forKey:(__bridge id)(kSecAttrComment)];
-    
-    NSNumber  *cherryID_ =[self.cherryIDSafeStore objectForKey:(__bridge id)(kSecAttrComment)];
+    NSNumber  *cherryID_ =[_appDelegate.cherryIDSafeStore objectForKey:(__bridge id)(kSecAttrComment)];
     if (cherryID_  && [cherryID_ integerValue] != - 1) {
         self.cherryID = cherryID_;
     }else {
@@ -1450,7 +1533,7 @@
     
     //[apiSrv sumbitScore:15 withUserID:1];
     [self.connServer getHiScore];
-    //[apiSrv getMyBeat:1];
+ 
     
     // Create a colored background (Dark Grey)
     CCNodeColor *background = [CCNodeColor nodeWithColor:[CCColor colorWithRed:0.2f green:0.2f blue:0.2f alpha:1.0f]];
@@ -1468,9 +1551,10 @@
     // Create a back button
  
     
-    // done
-
-	
+    // GAME center HELP
+    
+    
+    
     //score
 
     NSNumber *recordHighScore =[[NSUserDefaults standardUserDefaults] objectForKey:KeyHighScore];
@@ -1495,6 +1579,7 @@
 
 -(void)scoreSubmited:(NSNotification *)note
 {
+    NSLog(@"score,submited");
     [self.connServer getMyBeat:self.cherryID score:_scoreNumber];
 }
 -(void)gotBeatrank:(NSNotification *)note
@@ -1528,7 +1613,7 @@
     if (theData != nil) {
         NSNumber *userID = [theData objectForKey:@"user_id"];
         self.cherryID  = userID;
-        [self.cherryIDSafeStore setObject:userID forKey:(__bridge id)(kSecAttrComment)];
+        [_appDelegate.cherryIDSafeStore setObject:userID forKey:(__bridge id)(kSecAttrComment)];
         
         NSLog(@"USER ID is : %@", userID );
     }
@@ -1580,7 +1665,7 @@
 }
 -(void)getReady
 {
-    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     CCScene *currentScene = [CCDirector sharedDirector].runningScene;
     HelloWorldScene *newScene = [[[currentScene class] alloc] init];
     [newScene showGetReady];

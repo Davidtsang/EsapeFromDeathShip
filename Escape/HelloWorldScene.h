@@ -10,9 +10,7 @@
 // Importing cocos2d.h and cocos2d-ui.h, will import anything you need to start using Cocos2D v3
 #import "cocos2d.h"
 #import "cocos2d-ui.h"
-#import "KeychainItemWrapper.h"
-//#import <FacebookSDK/FacebookSDK.h>
-
+#import "AppDelegate.h"
 
 static NSString *KeyHighScore = @"high_score";
 static NSString *kCoins =@"game_coins";
@@ -23,6 +21,9 @@ static NSString *kCoins =@"game_coins";
 #define kSceneGetReady 21
 #define kSceneGameOver 22
 #define kSceneGameing 23
+
+#define kScoreSubmitLine 1
+
 /**
  *  The main scene
  */
@@ -31,16 +32,18 @@ static NSString *kCoins =@"game_coins";
 @class  ContactServer;
 
 @interface HelloWorldScene : CCScene
-<UIActionSheetDelegate>
+<UIActionSheetDelegate >
 {
     CCActionRepeatForever *_fightRepeat;
     BOOL _isGemeOver;
     BOOL _isNewBest;
+    
+    AppDelegate *_appDelegate;
 }
 // -----------------------------------------------------------------------
 @property(nonatomic,assign)NSInteger sceneType;
 @property(nonatomic,strong) id<ALSoundSource> fightEngine;
-@property(nonatomic,strong)KeychainItemWrapper *cherryIDSafeStore;
+
 @property(nonatomic,strong)NSNumber *cherryID;
 @property(nonatomic,strong)NSNumber *worldHiscore;
 @property(nonatomic,assign)float beatrank;

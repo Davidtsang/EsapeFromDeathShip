@@ -156,7 +156,7 @@
               NSDictionary *result =  (NSDictionary *)responseObject;
               
               //NSInteger success = [[result objectForKey:@"success"] integerValue];
-              NSLog(@"%@", result);
+              NSLog(@"submit score result:%@", result);
               [[NSNotificationCenter defaultCenter] postNotificationName:NoticeScoreSubmited object:self];
           }
           failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -196,15 +196,7 @@
              NSLog(@"Request Failed with Error: %@, %@", error, error.userInfo);
          }];
     
-//    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
-//        NSLog(@"%@", JSON);
-//        [[NSNotificationCenter defaultCenter] postNotificationName:NoticeGotBeatRank object:self userInfo:[NSDictionary dictionaryWithObject:[JSON objectForKey:@"beatrank"] forKey:@"beatrank"]];
-//        
-//    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
-//        NSLog(@"Request Failed with Error: %@, %@", error, error.userInfo);
-//    }];
-//    
-//    [operation start];
+
 
 
 }
