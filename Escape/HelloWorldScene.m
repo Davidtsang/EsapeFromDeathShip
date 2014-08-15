@@ -554,14 +554,14 @@
     
     //share or upgrade
     CCSpriteFrame *shareFrame = [CCSpriteFrame frameWithImageNamed:@"btn-share.png"];
-    if (_scoreNumber < kScoreSubmitLine ) {
+    if (_scoreNumber < kScoreSubmitLine && _appDelegate.isProVersion == NO ) {
         shareFrame = [CCSpriteFrame frameWithImageNamed:@"btn-remove-ads.png"];
     }
     
     [shareFrame.texture setAntialiased:NO];
     CCButton *share  = [CCButton buttonWithTitle:nil spriteFrame:shareFrame];
     
-    if (_scoreNumber < kScoreSubmitLine) {
+    if (_scoreNumber < kScoreSubmitLine  && _appDelegate.isProVersion == NO) {
         [share setTarget:self selector:@selector(upgradeToPro)];
     }else{
         [share setTarget:self selector:@selector(popSNSActionSheet)];
@@ -714,17 +714,7 @@
     [self addChild:_gameOver z:kZIndexUI];
     
 
-    //word hi score
-    if (self.worldHiscore) {
-        
-        NSString *wwString =[NSString stringWithFormat:@"World hi-score: %@",self.worldHiscore];
-        
-        CCLabelBMFont *wwHiscore = [CCLabelBMFont labelWithString:wwString fntFile:@"font3-export.fnt"];
-        [wwHiscore.texture setAntialiased:NO];
-        wwHiscore.position = ccp(share.position.x ,share.position.y +56);
-        [wwHiscore setScale:kScaleRate];
-        [_gameOver addChild:wwHiscore z:kZIndexUI];
-    }
+
     
     //beatrank
     
@@ -769,7 +759,7 @@
     if (_isGemeOver == NO ) {
         _scoreNumber += 1;
         
-        [[OALSimpleAudio sharedInstance] playEffect:@"score-add.wav" volume:0.1 pitch:1.0 pan:0.0 loop:NO];
+        [[OALSimpleAudio sharedInstance] playEffect:@"score-add.wav" volume:0.3 pitch:1.0 pan:0.0 loop:NO];
         //test
         
         //[[CCDirector sharedDirector] pause];
@@ -860,6 +850,10 @@
     self.fightEngine = [[OALSimpleAudio sharedInstance] playEffect:@"engine.wav" loop:YES];
 }
 
+-(void)playDoorSound
+{
+                  [[OALSimpleAudio sharedInstance] playEffect:@"door.wav" volume:0.3 pitch:1.0 pan:0.0 loop:NO];
+}
 -(void)moveDoors:(CCTime)delta
 {
     //door weight :32px;
@@ -874,7 +868,8 @@
     NSInteger  doorNumber = [_shipDoorsLeft count];
     if (_lastDoor  == nil || _lastDoor.position.y < (doorsOrginYPos-128)  ) {
         //gen new door
-
+       
+      
         //get a unshow door index
         
         for (NSInteger i= 0; i < doorNumber; i++) {
@@ -952,7 +947,10 @@
                 break;
             }
         }
-
+        //paly sound
+        if (self.sceneType != kSceneGameOver) {
+            [self playDoorSound];
+        }
     }
     
     for (NSInteger i =0;  i < doorNumber; i++ ) {
@@ -1008,11 +1006,13 @@
         _shipDoorsRight = [NSMutableArray arrayWithCapacity:doorNumber];
     }
     //
+    CCSpriteFrame *doorFrame =[CCSpriteFrame frameWithImageNamed:@"ship-door.png"];
+    [doorFrame.texture setAntialiased:NO];
     for (NSInteger i = 0; i < doorNumber; i++) {
         //
-        CCSprite *door = [CCSprite spriteWithImageNamed:@"ship-door.png"];
+        CCSprite *door = [CCSprite spriteWithSpriteFrame:doorFrame];
         [door setScale:kScaleRate];
-        [door.texture setAntialiased:NO];
+   
         
         float doorsOrginYPos = [CCDirector sharedDirector].viewSize.height+4;
         
@@ -1039,6 +1039,7 @@
         
     }
     [self schedule:@selector(moveDoors:) interval:0.0055f];
+
 }
 
 -(void)makeFloor
@@ -1061,13 +1062,15 @@
     // add floor
     //260 4*3
     NSInteger  partNumber = 5*3 ;
+    CCSpriteFrame *floorFrame = [CCSpriteFrame frameWithImageNamed:@"deathship-floor.png"];
+    [floorFrame.texture setAntialiased:NO];
     for (NSInteger i = 0; i < partNumber; i++) {
         //
         NSInteger yLevel = (int)i/3;
         NSInteger xLevel = i%3;
-        CCSprite *floorPart = [CCSprite spriteWithImageNamed:@"deathship-floor.png"];
+        CCSprite *floorPart = [CCSprite spriteWithSpriteFrame:floorFrame ];
         [floorPart setScale:2.0f];
-        [floorPart.texture setAntialiased:NO];
+        //[floorPart.texture setAntialiased:NO];
         NSInteger floorPartEageWidth = floorPart.contentSize.width*2;
         float yPos = floorPartEageWidth/2 + yLevel*floorPartEageWidth;
         float xPos = floorPartEageWidth * xLevel + floorPartEageWidth/2 +centerOffset;
@@ -1095,9 +1098,9 @@
         //
         NSInteger yLevel = (int)i/3;
         NSInteger xLevel = i%3;
-        CCSprite *floorPart = [CCSprite spriteWithImageNamed:@"deathship-floor.png"];
+        CCSprite *floorPart = [CCSprite spriteWithSpriteFrame:floorFrame];
         [floorPart setScale:kScaleRate];
-        [floorPart.texture setAntialiased:NO];
+        //[floorPart.texture setAntialiased:NO];
         NSInteger floorPartEageWidth = floorPart.contentSize.width*kScaleRate;
         float yPos = floorPartEageWidth/2 + yLevel*floorPartEageWidth;
         float xPos = floorPartEageWidth * xLevel + floorPartEageWidth/2+centerOffset;
@@ -1152,6 +1155,41 @@
     //wall
     CCSpriteFrameCache *frameCache =  [CCSpriteFrameCache sharedSpriteFrameCache];
     [frameCache addSpriteFramesWithFile:@"wall.plist"];
+    [frameCache addSpriteFramesWithFile:@"btn-restore.png"];
+    [frameCache addSpriteFramesWithFile:@"btn-remove-ads.png"];
+    [frameCache addSpriteFramesWithFile:@"btn-upgrade.png"];
+    [frameCache addSpriteFramesWithFile:@"btn-medal2.png"];
+    [frameCache addSpriteFramesWithFile:@"btn-medal1.png"];
+    [frameCache addSpriteFramesWithFile:@"btn-medal3.png"];
+    [frameCache addSpriteFramesWithFile:@"lb-gameover.png"];
+    [frameCache addSpriteFramesWithFile:@"new.png"];
+    [frameCache addSpriteFramesWithFile:@"home-title.png"];
+    [frameCache addSpriteFramesWithFile:@"copyright.png"];
+    [frameCache addSpriteFramesWithFile:@"tap-anim1.png"];
+    [frameCache addSpriteFramesWithFile:@"tap-anim0.png"];
+    [frameCache addSpriteFramesWithFile:@"top-anywhere.png"];
+    [frameCache addSpriteFramesWithFile:@"fake-fight.png"];
+    [frameCache addSpriteFramesWithFile:@"get-ready-title.png"];
+    [frameCache addSpriteFramesWithFile:@"btn-play.png"];
+    [frameCache addSpriteFramesWithFile:@"space-fight-l.png"];
+    [frameCache addSpriteFramesWithFile:@"space-fight-r.png"];
+    [frameCache addSpriteFramesWithFile:@"deathship-floor.png"];
+    [frameCache addSpriteFramesWithFile:@"space-fight-anim1.png"];
+    [frameCache addSpriteFramesWithFile:@"space-fight-anim0.png"];
+    [frameCache addSpriteFramesWithFile:@"btn-l.png"];
+    [frameCache addSpriteFramesWithFile:@"btn-r.png"];
+    [frameCache addSpriteFramesWithFile:@"fight-explode-anim1.png"];
+    [frameCache addSpriteFramesWithFile:@"fight-explode-anim4.png"];
+    [frameCache addSpriteFramesWithFile:@"fight-explode-anim3.png"];
+    [frameCache addSpriteFramesWithFile:@"fight-explode-anim2.png"];
+    [frameCache addSpriteFramesWithFile:@"fight-explode-anim0.png"];
+    [frameCache addSpriteFramesWithFile:@"info-board.png"];
+    [frameCache addSpriteFramesWithFile:@"ship-door.png"];
+    [frameCache addSpriteFramesWithFile:@"btn-share.png"];
+    [frameCache addSpriteFramesWithFile:@"btn-rate.png"];
+    [frameCache addSpriteFramesWithFile:@"btn-replay.png"];
+    [frameCache addSpriteFramesWithFile:@"btn-ranking.png"];
+    
 }
 -(void)makeWall
 {
@@ -1346,7 +1384,8 @@
 {
     NSInteger btnScale = 3;
     
-    CCSprite *btnL = [CCSprite spriteWithImageNamed:@"btn-l.png"];
+    CCSpriteFrame *btnLFrame =[CCSpriteFrame frameWithImageNamed:@"btn-l.png"];
+    CCSprite *btnL = [CCSprite spriteWithSpriteFrame:btnLFrame];
     [btnL setScale:btnScale];
     [btnL.texture setAntialiased:NO];
     btnL.opacity = 0.4;
@@ -1360,7 +1399,8 @@
     [self addChild:_btnL z:kZIndexUI];
     
     //
-    CCSprite *btnR = [CCSprite spriteWithImageNamed:@"btn-r.png"];
+    CCSpriteFrame *btnRFrame =[CCSpriteFrame frameWithImageNamed:@"btn-r.png"];
+    CCSprite *btnR = [CCSprite spriteWithSpriteFrame:btnRFrame];
     [btnR setScale:btnScale];
     [btnR.texture setAntialiased:NO];
     btnR.opacity = 0.4;
@@ -1587,8 +1627,9 @@
     NSDictionary *theData = [note userInfo];
     if (theData != nil) {
         NSNumber *beatrank = [theData objectForKey:@"beatrank"];
+        NSNumber *userRank = [theData objectForKey:@"user_rank"];
         self.beatrank  = [beatrank floatValue];
-      
+        
         NSLog(@"Beatrank is : %@", beatrank );
         if (self.sceneType == kSceneGameOver) {
             
@@ -1601,8 +1642,18 @@
             beatrank.position = ccp(share.position.x ,share.position.y +34);
             [beatrank setScale:kScaleRate];
             [_gameOver addChild:beatrank z:kZIndexUI];
+            
+            //rank
+            NSString *wwString =[NSString stringWithFormat:@"Rank: #%@ (World)",[userRank stringValue]];
+            
+            CCLabelBMFont *wwHiscore = [CCLabelBMFont labelWithString:wwString fntFile:@"font3-export.fnt"];
+            [wwHiscore.texture setAntialiased:NO];
+            wwHiscore.position = ccp(share.position.x ,share.position.y +56);
+            [wwHiscore setScale:kScaleRate];
+            [_gameOver addChild:wwHiscore z:kZIndexUI];
+            
         }
-
+        
         
     }
 }
@@ -1709,7 +1760,8 @@
     [self addChild:_fakeFight z:kZIndexFight -1];
     
     //TAP ANYWAHERE
-    CCSprite *tapAnywhere = [CCSprite spriteWithImageNamed:@"top-anywhere.png"];
+    CCSpriteFrame *tapAnyFrame =[CCSpriteFrame frameWithImageNamed:@"top-anywhere.png"];
+    CCSprite *tapAnywhere = [CCSprite spriteWithSpriteFrame:tapAnyFrame];
     [tapAnywhere.texture setAntialiased:NO];
     [tapAnywhere setScale:kScaleRate];
     tapAnywhere.position = ccp(viewSize.width/2,viewSize.height/2);

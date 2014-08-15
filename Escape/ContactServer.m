@@ -20,9 +20,9 @@
     if (self) {
     
     NSString *rqsBaseURI = ApiAddress;
-    #ifdef DEBUG
-    rqsBaseURI = @"http://127.0.0.1:5000/api/v1.0";
-    #endif
+//    #ifdef DEBUG
+//    rqsBaseURI = @"http://127.0.0.1:5000/api/v1.0";
+//    #endif
     
     self.rqsBaseURI  = rqsBaseURI;
     // done
@@ -190,7 +190,7 @@
              //NSInteger success = [[result objectForKey:@"success"] integerValue];
              NSLog(@"%@", result);
             [[NSNotificationCenter defaultCenter] postNotificationName:NoticeGotBeatRank
-                                                                object:self userInfo:[NSDictionary dictionaryWithObject:[result objectForKey:@"beatrank"] forKey:@"beatrank"]];
+                                                                object:self userInfo:result];
          }
          failure:^(AFHTTPRequestOperation *operation, NSError *error) {
              NSLog(@"Request Failed with Error: %@, %@", error, error.userInfo);
