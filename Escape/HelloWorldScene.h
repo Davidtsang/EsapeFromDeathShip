@@ -22,8 +22,14 @@ static NSString *kCoins =@"game_coins";
 #define kSceneGameOver 22
 #define kSceneGameing 23
 
-#define kScoreSubmitLine 25
+#define kScoreSubmitLine 5
+#define kGameCenterScoreSubmitLine 10
 
+#define kMedalIronScore 25
+#define kMedalBronzeScore 50
+#define kMedalSilverScore 100
+#define kMedalGoldScore 500
+#define kMedalPlatinumScore 1000
 /**
  *  The main scene
  */

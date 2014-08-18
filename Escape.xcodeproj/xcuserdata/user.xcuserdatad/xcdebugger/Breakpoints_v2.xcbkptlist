@@ -6,16 +6,60 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Escape/HelloWorldScene.h"
+            timestampString = "429777072.892818"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "11"
+            endingLineNumber = "11">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "-[HelloWorldScene sceneType]"
+                  moduleName = "Escape"
+                  urlString = "file://localhost/Users/user/Documents/Projects/Escape/Escape/HelloWorldScene.h"
+                  timestampString = "429777072.943078"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "45"
+                  endingLineNumber = "45"
+                  offsetFromSymbolStart = "24">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "-[HelloWorldScene setSceneType:]"
+                  moduleName = "Escape"
+                  urlString = "file://localhost/Users/user/Documents/Projects/Escape/Escape/HelloWorldScene.h"
+                  timestampString = "429777072.944541"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "45"
+                  endingLineNumber = "45"
+                  offsetFromSymbolStart = "31">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Escape/HelloWorldScene.m"
-            timestampString = "429759436.940305"
+            timestampString = "430050481.912156"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1614"
-            endingLineNumber = "1614"
-            landmarkName = "-init"
+            startingLineNumber = "821"
+            endingLineNumber = "821"
+            landmarkName = "-shipWallMove:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
