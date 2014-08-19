@@ -119,7 +119,7 @@
              NSDictionary *result =  (NSDictionary *)responseObject;
              
              //NSInteger success = [[result objectForKey:@"success"] integerValue];
-             NSLog(@"%@", result);
+             NSLog(@"RQS USER CREATE :%@", result);
             [[NSNotificationCenter defaultCenter] postNotificationName:NoticeGotUserID
                                                                 object:self userInfo:[NSDictionary dictionaryWithObject:[result objectForKey:@"user_id"] forKey:@"user_id"]];
          }

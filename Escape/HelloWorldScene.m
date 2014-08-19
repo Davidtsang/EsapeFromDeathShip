@@ -19,9 +19,21 @@
 
 #define kTagActFightJet 30000
 
+#define kSpeed0 0.0055f //<25
+#define kSpeed1 0.0050f //<50
+#define kSpeed2 0.0045f //<100
+#define kSpeed3 0.0042f //>100
+
+#define kFightMoveSpeed 0.09
+
+#define kSpeedRange1 50
+#define kSpeedRange2 100
+#define kSpeedRange3 500
+
 @implementation HelloWorldScene
 {
     
+    CCTime _nowSpeed;
     
     CCSprite *_spaceFight;
     CCNode *_deathshipFloor1;
@@ -629,32 +641,61 @@
     _gameOverScore.anchorPoint = ccp(1.0f,0.5f);
     _gameOverScore.position = ccp(replay.position.x +board.contentSize.width/2*kScaleRate-16, board.position.y + board.contentSize.height/2*kScaleRate - _gameOverScore.contentSize.height/2 -32);
     
-//#warning test
-//    _highScoreNumber =99999;
+    //#warning test
+    //    _highScoreNumber =99999;
     //medal tips:
     NSString *hiScoresMedalName = nil;
     
-    NSString *medalTips= [NSString stringWithFormat:@"To reach %ld scores\nyou can get a iron medal",(long)kMedalIronScore];
+    BOOL isCNUser = NO;
+    if ([[GameKitHelper sharedInstance].userCountryCode isEqualToString:@"CN"]) {
+        isCNUser = YES;
+    }
+    
+    NSString *medalTips= [NSString stringWithFormat:@"To reach %ld scores\nyou can get iron medal",(long)kMedalIronScore];
+    if (isCNUser) {
+        medalTips= [NSString stringWithFormat:@"达到%ld分\n你可得到铁勋章",(long)kMedalIronScore];
+    }
     if (_highScoreNumber > kMedalIronScore){
-        medalTips =[NSString stringWithFormat:@"To reach %ld scores\nyou can get a bronze medal",(long)kMedalBronzeScore];
+        medalTips =[NSString stringWithFormat:@"To reach %ld scores\nyou can get bronze medal",(long)kMedalBronzeScore];
         hiScoresMedalName = @"medal4.png";
+        
+        if (isCNUser) {
+            medalTips= [NSString stringWithFormat:@"达到%ld分\n你可得到铜勋章",(long)kMedalBronzeScore];
+        }
+
     }
     if (_highScoreNumber > kMedalBronzeScore){
-        medalTips =[NSString stringWithFormat:@"To reach %ld scores\nyou can get a silver medal",(long)kMedalSilverScore];
+        medalTips =[NSString stringWithFormat:@"To reach %ld scores\nyou can get silver medal",(long)kMedalSilverScore];
         hiScoresMedalName = @"medal3.png";
+        
+        if (isCNUser) {
+            medalTips= [NSString stringWithFormat:@"达到%ld分\n你可得到银勋章",(long)kMedalSilverScore];
+        }
+
     }
     
     if (_highScoreNumber > kMedalSilverScore){
         medalTips =[NSString stringWithFormat:@"To reach %ld scores\nyou can get a gold medal",(long)kMedalGoldScore];
         hiScoresMedalName = @"medal2.png";
+        
+        if (isCNUser) {
+            medalTips= [NSString stringWithFormat:@"达到%ld分\n你可得到金勋章",(long)kMedalGoldScore];
+        }
     }
     if (_highScoreNumber > kMedalGoldScore){
         medalTips =[NSString stringWithFormat:@"To reach %ld scores\ncan get a platinum medal",(long)kMedalPlatinumScore];
         hiScoresMedalName = @"medal1.png";
+        if (isCNUser) {
+            medalTips= [NSString stringWithFormat:@"达到%ld分\n你可得到白金勋章",(long)kMedalPlatinumScore];
+        }
     }
+    
     if (_highScoreNumber > kMedalPlatinumScore){
-        medalTips = @"Awesome!\nYou've got all medals!" ;
+        medalTips = @"Incredible! You have \nexceeded the limits of humanity!" ;
         hiScoresMedalName = @"medal0.png";
+        if (isCNUser) {
+            medalTips= @"不可思议的成就!\n你已突破人类的极限!";
+        }
     }
     
     //high score
@@ -735,8 +776,11 @@
     }else if(!_isNewBest){
         //show medal tips
         CCLabelBMFont *medalTipsLable =[CCLabelBMFont labelWithString:medalTips fntFile:@"font3-export.fnt"];
-        [medalTipsLable.texture setAntialiased:NO];
         [medalTipsLable setScale:kScaleRate];
+        
+        
+        [medalTipsLable.texture setAntialiased:NO];
+        
         medalTipsLable.position = ccp(replay.position.x  ,highScore.position.y -46);
         [medalTipsLable setAlignment:CCTextAlignmentCenter];
         [_gameOver addChild:medalTipsLable];
@@ -781,7 +825,7 @@
     _deathshipFloor2.position= ccp(_deathshipFloor2.position.x, _deathshipFloor1.position.y+ _deathshipFloor1.contentSize.height);
     if (_deathshipFloor2.position.y  == 0) {
         [_deathshipFloor1 setPosition:ccp(_deathshipFloor1.position.x, 0)];
-         
+        
     }
     
     
@@ -900,10 +944,11 @@
     //if = nil or move 32px add new door
     float doorsOrginYPos = [CCDirector sharedDirector].viewSize.height+4;
     NSInteger  doorNumber = [_shipDoorsLeft count];
- 
+    
+    //space lost
+    //NSInteger spaceLostRandomStart =arc4random_uniform(doorNumber);
+    
     if (_lastDoor  == nil || _lastDoor.position.y < (doorsOrginYPos-128)  ) {
-        //gen new door
-        
         
         //get a unshow door index
         
@@ -917,14 +962,6 @@
                 float doorMoveTime = 0.8;
                 float doorPartWidth = 64;
                 NSInteger doorGapLoction = arc4random_uniform(4);
-                
-                
-                //                //test:
-                //                if ( i % 2 == 0) {
-                //                    doorGapLoction = 3  ;
-                //                }else{
-                //                    doorGapLoction  =0;
-                //                }
                 
                 //naver > 4 step
                 NSInteger maxDistance = 3;
@@ -969,7 +1006,7 @@
                 [door runAction:leftDoorMoveAct];
                 _lastDoor = door;
                 door.position = ccp(door.position.x, door.position.y-1);
-   
+                
                 //RIGHT DOOR
                 //doorGapLoction = 1;
                 float rightDoorMoveToPos =(doorGapLoction+1) * doorPartWidth + doorRight.contentSize.width/2*kScaleRate;
@@ -980,6 +1017,11 @@
                 
                 doorRight.position = ccp(doorRight.position.x, doorRight.position.y-1);
                 break;
+                
+                //make space lost loction:
+                //doorgap +1/-1
+                
+                
             }
         }
         //paly sound
@@ -1016,13 +1058,64 @@
             
             door.position = ccp(doorsLeftOriginXPos, doorsOrginYPos);
             doorRight.position = ccp(doorsRightOriginXPos, doorsOrginYPos);
-            
         }
     }
     //add child ,and let them move
     //if door out sreen range, mark them unshow
     
+    //speed change
+    NSInteger tenTest = _scoreNumber % 20;
     
+    if (_scoreNumber > 0 && _scoreNumber < kSpeedRange2 ) {
+        if (tenTest ==  10 && _nowSpeed == kSpeed0) {
+            _nowSpeed = kSpeed1;
+            //NSLog(@"score %ld ,change to speed1", (long)_scoreNumber);
+            [self changeSpeed:kSpeed1];
+        }else if (tenTest == 0 && _nowSpeed == kSpeed1)
+        {
+            _nowSpeed = kSpeed0;
+            //NSLog(@"score %ld ,change to speed0", (long)_scoreNumber);
+            [self changeSpeed:kSpeed0];
+        }
+    }
+    if (_scoreNumber >= kSpeedRange1  && _scoreNumber < kSpeedRange2) {
+        
+        if (tenTest ==  10 && _nowSpeed == kSpeed0) {
+            _nowSpeed = kSpeed2;
+            //NSLog(@"score %ld ,change to speed1", (long)_scoreNumber);
+            [self changeSpeed:kSpeed2];
+        }else if (tenTest == 0 && _nowSpeed == kSpeed2)
+        {
+            _nowSpeed = kSpeed0;
+            //NSLog(@"score %ld ,change to speed0", (long)_scoreNumber);
+            [self changeSpeed:kSpeed0];
+        }
+        
+    }else  if (_scoreNumber >=kSpeedRange2 && _scoreNumber < kSpeedRange3) {
+        if (tenTest ==  10 && _nowSpeed == kSpeed1) {
+            _nowSpeed = kSpeed2;
+            //NSLog(@"score %ld ,change to speed1", (long)_scoreNumber);
+            [self changeSpeed:kSpeed2];
+        }else if (tenTest == 0 && _nowSpeed == kSpeed2)
+        {
+            _nowSpeed = kSpeed1;
+            //NSLog(@"score %ld ,change to speed0", (long)_scoreNumber);
+            [self changeSpeed:kSpeed1];
+        }
+        
+    }else  if (_scoreNumber > kSpeedRange3) {
+        if (tenTest ==  10 && _nowSpeed == kSpeed3) {
+            _nowSpeed = kSpeed2;
+            //NSLog(@"score %ld ,change to speed1", (long)_scoreNumber);
+            [self changeSpeed:kSpeed2];
+        }else if (tenTest == 0 && _nowSpeed == kSpeed2)
+        {
+            _nowSpeed = kSpeed3;
+            //NSLog(@"score %ld ,change to speed0", (long)_scoreNumber);
+            [self changeSpeed:kSpeed3];
+        }
+        
+    }
 }
 -(void)remakeWall1
 {
@@ -1058,7 +1151,7 @@
         
         door.position = ccp(doorsLeftOriginXPos, doorsOrginYPos);
         
-
+        
         
         //right side
         CCSprite *doorRight = [CCSprite spriteWithTexture:door.texture];
@@ -1078,48 +1171,56 @@
         
         
     }
-
-
     
-    [self schedule:@selector(moveDoors:) interval:0.0055f];
+    
+    _nowSpeed =kSpeed0;
+    [self schedule:@selector(moveDoors:) interval:kSpeed0];
     
 }
-
--(void)addSpaceLost
+-(void)changeSpeed:(CCTime )time_
 {
-    //space man
-    CCNode *spaceLost = [CCNode node];
-    spaceLost.contentSize = CGSizeMake(16, 28);
+    [self unschedule:@selector(moveDoors:)];
+    [self schedule:@selector(moveDoors:) interval:time_];
     
-    CCSpriteFrame *manFrame = [CCSpriteFrame frameWithImageNamed:@"space-man.png"];
-    [manFrame.texture setAntialiased:NO];
-    CCSprite *spaceMan = [CCSprite spriteWithSpriteFrame:manFrame];
-    spaceMan.position = ccp(0, 0);
-    [spaceMan setScale:kScaleRate];
-    //spaceMan.position = ccp(100, 100);
-    
-    
-    
-    CCActionRotateBy* actionSpin = [CCActionRotateBy actionWithDuration:5.0f angle:360];
-    [spaceMan runAction:[CCActionRepeatForever actionWithAction:actionSpin]];
-    _spaceMan = spaceMan;
-    [spaceLost addChild:spaceMan];
-    
-    //sos
-    CCSpriteFrame *sosFrame = [CCSpriteFrame frameWithImageNamed:@"sos.png"];
-    [sosFrame.texture setAntialiased:NO];
-    CCSprite *sos = [CCSprite spriteWithSpriteFrame:sosFrame];
-    [sos setScale:kScaleRate];
-    sos.position  = ccp(spaceMan.position.x, spaceMan.position.y + spaceMan.contentSize.height/2*kScaleRate + sos.contentSize.height/2*kScaleRate + 2);
-    
-    [spaceLost addChild:sos];
-    
-    
-    _spaceLost = spaceLost;
-    _spaceLost.position =ccp(0, 0);
-    
-    [self addChild:_spaceLost z:kZIndexDoor +1 ];
+    //walll
+    [self unschedule:@selector(shipWallMove:)];
+    [self schedule:@selector(shipWallMove:) interval:time_];
 }
+//-(void)addSpaceLost
+//{
+//    //space man
+//    CCNode *spaceLost = [CCNode node];
+//    spaceLost.contentSize = CGSizeMake(16, 28);
+//
+//    CCSpriteFrame *manFrame = [CCSpriteFrame frameWithImageNamed:@"space-man.png"];
+//    [manFrame.texture setAntialiased:NO];
+//    CCSprite *spaceMan = [CCSprite spriteWithSpriteFrame:manFrame];
+//    spaceMan.position = ccp(0, 0);
+//    [spaceMan setScale:kScaleRate];
+//    //spaceMan.position = ccp(100, 100);
+//
+//
+//
+//    CCActionRotateBy* actionSpin = [CCActionRotateBy actionWithDuration:5.0f angle:360];
+//    [spaceMan runAction:[CCActionRepeatForever actionWithAction:actionSpin]];
+//    _spaceMan = spaceMan;
+//    [spaceLost addChild:spaceMan];
+//
+//    //sos
+//    CCSpriteFrame *sosFrame = [CCSpriteFrame frameWithImageNamed:@"sos.png"];
+//    [sosFrame.texture setAntialiased:NO];
+//    CCSprite *sos = [CCSprite spriteWithSpriteFrame:sosFrame];
+//    [sos setScale:kScaleRate];
+//    sos.position  = ccp(spaceMan.position.x, spaceMan.position.y + spaceMan.contentSize.height/2*kScaleRate + sos.contentSize.height/2*kScaleRate + 2);
+//
+//    [spaceLost addChild:sos];
+//
+//
+//    _spaceLost = spaceLost;
+//    _spaceLost.position =ccp(0, 0);
+//
+//    [self addChild:_spaceLost z:kZIndexDoor +1 ];
+//}
 
 -(void)makeFloor
 {
@@ -1270,8 +1371,8 @@
     [frameCache addSpriteFramesWithFile:@"btn-rate.png"];
     [frameCache addSpriteFramesWithFile:@"btn-replay.png"];
     [frameCache addSpriteFramesWithFile:@"btn-ranking.png"];
-    [frameCache addSpriteFramesWithFile:@"space-man.png"];
-    [frameCache addSpriteFramesWithFile:@"sos.png"];
+    //[frameCache addSpriteFramesWithFile:@"space-man.png"];
+    //[frameCache addSpriteFramesWithFile:@"sos.png"];
 }
 -(void)makeWall
 {
@@ -1284,7 +1385,7 @@
     wall2.position = ccp(0, wall1.position.y+ wall1.contentSize.height*kScaleRate );
     
     [self addChild:wall2 z:kZIndexShipWall];
-    [self schedule:@selector(shipWallMove:) interval:0.0055f];
+    [self schedule:@selector(shipWallMove:) interval:kSpeed0];
     
 }
 -(CCNode *)makeAWall
@@ -1583,7 +1684,7 @@
             
             //size 24* 8
             float fightTestWidth =26;
-            float fightTestHeight= 14;
+            float fightTestHeight= 16;
             
             CGRect fightRect = CGRectMake(
                                           _spaceFight.position.x - (fightTestWidth/2),
@@ -1646,7 +1747,7 @@
     //get cherry id
     
     
-    NSNumber  *cherryID_ =[_appDelegate.cherryIDSafeStore objectForKey:(__bridge id)(kSecAttrComment)];
+    NSNumber  *cherryID_ =[_appDelegate.cherryIDSafeStore objectForKey:(__bridge id)(kSecAttrLabel)];
     if (cherryID_  && [cherryID_ integerValue] != - 1) {
         self.cherryID = cherryID_;
     }else {
@@ -1687,7 +1788,7 @@
         _highScoreNumber = [recordHighScore integerValue];
     }
     
-    [self addSpaceLost];
+    //[self addSpaceLost];
     
     //get hiscore
     //[apiSrv getHiScore];
@@ -1752,7 +1853,7 @@
     if (theData != nil) {
         NSNumber *userID = [theData objectForKey:@"user_id"];
         self.cherryID  = userID;
-        [_appDelegate.cherryIDSafeStore setObject:userID forKey:(__bridge id)(kSecAttrComment)];
+        [_appDelegate.cherryIDSafeStore setObject:userID forKey:(__bridge id)(kSecAttrLabel)];
         
         NSLog(@"USER ID is : %@", userID );
     }
@@ -2047,7 +2148,7 @@
         [frame.texture setAntialiased:NO];
         [frames addObject:frame];
         
-        CCAnimation *anim = [CCAnimation animationWithSpriteFrames:frames delay:0.15f];
+        CCAnimation *anim = [CCAnimation animationWithSpriteFrames:frames delay:0.2];
         CCActionAnimate* animate = [CCActionAnimate actionWithAnimation:anim];
         
         [_spaceFight stopAction:_fightRepeat];
@@ -2061,7 +2162,7 @@
         
         // Move our sprite to touch location
         CGPoint  movePos= CGPointMake(_spaceFight.position.x+ moveStep, _spaceFight.position.y );
-        CCActionMoveTo *actionMove = [CCActionMoveTo actionWithDuration:0.15f position:movePos];
+        CCActionMoveTo *actionMove = [CCActionMoveTo actionWithDuration:kFightMoveSpeed position:movePos];
         
         [_spaceFight runAction:actionMove];
     }

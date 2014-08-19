@@ -16,6 +16,9 @@
 		CE1B5B4519A11164006AC277 /* medal4.png in Resources */ = {isa = PBXBuildFile; fileRef = CE1B5B4319A11164006AC277 /* medal4.png */; };
 		CE259BFD19A1E1DF001464D8 /* space-man.png in Resources */ = {isa = PBXBuildFile; fileRef = CE259BFC19A1E1DF001464D8 /* space-man.png */; };
 		CE259C0119A20BE5001464D8 /* sos.png in Resources */ = {isa = PBXBuildFile; fileRef = CE259C0019A20BE5001464D8 /* sos.png */; };
+		CE259C2419A33402001464D8 /* font3-export.fnt in Resources */ = {isa = PBXBuildFile; fileRef = CE259C2219A33402001464D8 /* font3-export.fnt */; };
+		CE259C2519A33402001464D8 /* font3-export.png in Resources */ = {isa = PBXBuildFile; fileRef = CE259C2319A33402001464D8 /* font3-export.png */; };
+		CE259C2819A33E49001464D8 /* UICKeyChainStore.m in Sources */ = {isa = PBXBuildFile; fileRef = CE259C2719A33E49001464D8 /* UICKeyChainStore.m */; };
 		CE3564B91994C32800317F9E /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE3564B81994C32800317F9E /* Social.framework */; };
 		CE3564CE1994C55800317F9E /* AFHTTPRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3564BC1994C55800317F9E /* AFHTTPRequestOperation.m */; };
 		CE3564CF1994C55800317F9E /* AFHTTPRequestOperationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3564BE1994C55800317F9E /* AFHTTPRequestOperationManager.m */; };
@@ -39,8 +42,6 @@
 		CE3564F61995122500317F9E /* engine.wav in Resources */ = {isa = PBXBuildFile; fileRef = CE3564F51995122500317F9E /* engine.wav */; };
 		CE3564F91995129A00317F9E /* hurt.wav in Resources */ = {isa = PBXBuildFile; fileRef = CE3564F71995129A00317F9E /* hurt.wav */; };
 		CE3564FA1995129A00317F9E /* start.wav in Resources */ = {isa = PBXBuildFile; fileRef = CE3564F81995129A00317F9E /* start.wav */; };
-		CE4B2711199DAE64008AB140 /* font3-export.fnt in Resources */ = {isa = PBXBuildFile; fileRef = CE4B270F199DAE64008AB140 /* font3-export.fnt */; };
-		CE4B2712199DAE64008AB140 /* font3-export.png in Resources */ = {isa = PBXBuildFile; fileRef = CE4B2710199DAE64008AB140 /* font3-export.png */; };
 		CE63AF041996020C00D8402B /* tohame-wb-export.fnt in Resources */ = {isa = PBXBuildFile; fileRef = CE63AF021996020C00D8402B /* tohame-wb-export.fnt */; };
 		CE63AF051996020C00D8402B /* tohame-wb-export.png in Resources */ = {isa = PBXBuildFile; fileRef = CE63AF031996020C00D8402B /* tohame-wb-export.png */; };
 		CE63AF081996047F00D8402B /* msss-export.fnt in Resources */ = {isa = PBXBuildFile; fileRef = CE63AF061996047F00D8402B /* msss-export.fnt */; };
@@ -321,6 +322,10 @@
 		CE1B5B4319A11164006AC277 /* medal4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = medal4.png; sourceTree = "<group>"; };
 		CE259BFC19A1E1DF001464D8 /* space-man.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "space-man.png"; sourceTree = "<group>"; };
 		CE259C0019A20BE5001464D8 /* sos.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sos.png; sourceTree = "<group>"; };
+		CE259C2219A33402001464D8 /* font3-export.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "font3-export.fnt"; sourceTree = "<group>"; };
+		CE259C2319A33402001464D8 /* font3-export.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "font3-export.png"; sourceTree = "<group>"; };
+		CE259C2619A33E49001464D8 /* UICKeyChainStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UICKeyChainStore.h; sourceTree = "<group>"; };
+		CE259C2719A33E49001464D8 /* UICKeyChainStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UICKeyChainStore.m; sourceTree = "<group>"; };
 		CE3564B61994B41300317F9E /* Twitter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Twitter.framework; path = System/Library/Frameworks/Twitter.framework; sourceTree = SDKROOT; };
 		CE3564B81994C32800317F9E /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		CE3564BB1994C55800317F9E /* AFHTTPRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperation.h; sourceTree = "<group>"; };
@@ -364,8 +369,6 @@
 		CE3564F51995122500317F9E /* engine.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = engine.wav; sourceTree = "<group>"; };
 		CE3564F71995129A00317F9E /* hurt.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = hurt.wav; sourceTree = "<group>"; };
 		CE3564F81995129A00317F9E /* start.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = start.wav; sourceTree = "<group>"; };
-		CE4B270F199DAE64008AB140 /* font3-export.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "font3-export.fnt"; sourceTree = "<group>"; };
-		CE4B2710199DAE64008AB140 /* font3-export.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "font3-export.png"; sourceTree = "<group>"; };
 		CE63AF021996020C00D8402B /* tohame-wb-export.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "tohame-wb-export.fnt"; sourceTree = "<group>"; };
 		CE63AF031996020C00D8402B /* tohame-wb-export.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tohame-wb-export.png"; sourceTree = "<group>"; };
 		CE63AF061996047F00D8402B /* msss-export.fnt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "msss-export.fnt"; sourceTree = "<group>"; };
@@ -884,8 +887,8 @@
 		CE020DF0198F8C6D00FDA716 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
-				CE4B270F199DAE64008AB140 /* font3-export.fnt */,
-				CE4B2710199DAE64008AB140 /* font3-export.png */,
+				CE259C2219A33402001464D8 /* font3-export.fnt */,
+				CE259C2319A33402001464D8 /* font3-export.png */,
 				CE63AF061996047F00D8402B /* msss-export.fnt */,
 				CE63AF071996047F00D8402B /* msss-export.png */,
 				CE63AF021996020C00D8402B /* tohame-wb-export.fnt */,
@@ -901,6 +904,8 @@
 				CE678807198B547700214CCE /* tiny-pixel.fnt */,
 				CE678808198B547700214CCE /* small-pixel.fnt */,
 				CE6787D8198B53DA00214CCE /* small-pixel.png */,
+				CE259C2619A33E49001464D8 /* UICKeyChainStore.h */,
+				CE259C2719A33E49001464D8 /* UICKeyChainStore.m */,
 			);
 			name = Fonts;
 			sourceTree = "<group>";
@@ -1966,7 +1971,6 @@
 				CE8D96C7199C9CBF0000A4E6 /* wall.plist in Resources */,
 				CE8D96AA199C9C9F0000A4E6 /* get-ready-title.png in Resources */,
 				CE8D96AC199C9C9F0000A4E6 /* space-fight-l.png in Resources */,
-				CE4B2712199DAE64008AB140 /* font3-export.png in Resources */,
 				CE1B5B4419A11164006AC277 /* medal0.png in Resources */,
 				CE6787F6198B53DA00214CCE /* tohame-export.png in Resources */,
 				CE8D96C2199C9C9F0000A4E6 /* btn-rate.png in Resources */,
@@ -1976,7 +1980,6 @@
 				CE8D96A5199C9C9F0000A4E6 /* copyright.png in Resources */,
 				CE8D96BE199C9C9F0000A4E6 /* fight-explode-anim0.png in Resources */,
 				CE3564F91995129A00317F9E /* hurt.wav in Resources */,
-				CE4B2711199DAE64008AB140 /* font3-export.fnt in Resources */,
 				CE88B39119A0795F000A6D22 /* Icon-iPad-Spotlight-iOS7@2x.png in Resources */,
 				CE8D96B5199C9C9F0000A4E6 /* deathship-floor.png in Resources */,
 				CE90C0A6199CA772007C3E29 /* door.wav in Resources */,
@@ -1993,6 +1996,7 @@
 				CE88B38919A0795F000A6D22 /* Icon-72@2x.png in Resources */,
 				CE8D969F199C9C9F0000A4E6 /* medal2.png in Resources */,
 				CE63AF041996020C00D8402B /* tohame-wb-export.fnt in Resources */,
+				CE259C2419A33402001464D8 /* font3-export.fnt in Resources */,
 				CE6787F7198B53DA00214CCE /* pixel-font2.png in Resources */,
 				CE7212F11973D488001B5D98 /* LICENSE_Chipmunk.txt in Resources */,
 				CE6787FD198B53DA00214CCE /* small-pixel.png in Resources */,
@@ -2011,6 +2015,7 @@
 				CE63AF051996020C00D8402B /* tohame-wb-export.png in Resources */,
 				CE8D96C0199C9C9F0000A4E6 /* ship-door.png in Resources */,
 				CE67880C198B547700214CCE /* big-pixel-export.fnt in Resources */,
+				CE259C2519A33402001464D8 /* font3-export.png in Resources */,
 				CE3564FA1995129A00317F9E /* start.wav in Resources */,
 				CE8D969C199C9C9F0000A4E6 /* btn-restore.png in Resources */,
 				CE259C0119A20BE5001464D8 /* sos.png in Resources */,
@@ -2058,6 +2063,7 @@
 				CE7210D81973D486001B5D98 /* CCEffectColor.m in Sources */,
 				CE7210D21973D486001B5D98 /* CCEffect.m in Sources */,
 				CE7212701973D488001B5D98 /* CCBAnimationManager.m in Sources */,
+				CE259C2819A33E49001464D8 /* UICKeyChainStore.m in Sources */,
 				CE7211DE1973D487001B5D98 /* CCVertex.m in Sources */,
 				CE7211121973D486001B5D98 /* CCAnimationCache.m in Sources */,
 				CE3564EC19950E7D00317F9E /* UIActivityIndicatorView+AFNetworking.m in Sources */,
