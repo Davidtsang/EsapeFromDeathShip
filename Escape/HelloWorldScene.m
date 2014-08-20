@@ -34,7 +34,7 @@
 {
     
     CCTime _nowSpeed;
-    
+    CCButton *_replay;
     CCSprite *_spaceFight;
     CCNode *_deathshipFloor1;
     CCNode *_deathshipFloor2;
@@ -546,6 +546,8 @@
     
     [replay setTarget:self selector:@selector(getReady)];
     
+    _replay  = replay;
+    
     //rate
     CCSpriteFrame *rateFrame = [CCSpriteFrame frameWithImageNamed:@"btn-rate.png"];
     [rateFrame.texture setAntialiased:NO];
@@ -660,7 +662,7 @@
         hiScoresMedalName = @"medal4.png";
         
         if (isCNUser) {
-            medalTips= [NSString stringWithFormat:@"达到%ld分\n你可得到铜勋章",(long)kMedalBronzeScore];
+            medalTips= [NSString stringWithFormat:@"达到%ld分\n你可得到青铜勋章",(long)kMedalBronzeScore];
         }
 
     }
@@ -669,7 +671,7 @@
         hiScoresMedalName = @"medal3.png";
         
         if (isCNUser) {
-            medalTips= [NSString stringWithFormat:@"达到%ld分\n你可得到银勋章",(long)kMedalSilverScore];
+            medalTips= [NSString stringWithFormat:@"达到%ld分\n你可得到银质勋章",(long)kMedalSilverScore];
         }
 
     }
@@ -679,7 +681,7 @@
         hiScoresMedalName = @"medal2.png";
         
         if (isCNUser) {
-            medalTips= [NSString stringWithFormat:@"达到%ld分\n你可得到金勋章",(long)kMedalGoldScore];
+            medalTips= [NSString stringWithFormat:@"达到%ld分\n你可得到金质勋章",(long)kMedalGoldScore];
         }
     }
     if (_highScoreNumber > kMedalGoldScore){
@@ -807,6 +809,7 @@
 
 -(void)gameScoreAdd:(CCTime)delta
 {
+    _replay.enabled =       NO;
     NSInteger overScore =[_gameOverScore.string integerValue];
     if (overScore < _scoreNumber ) {
         //
@@ -814,7 +817,9 @@
         [_gameOverScore setString:[NSString stringWithFormat:@"%ld", (long)overScore+1]  ];
         
     }else{
+        
         [self unschedule:@selector(gameScoreAdd:)];
+        _replay.enabled = YES;
     }
 }
 
@@ -1066,7 +1071,7 @@
     //speed change
     NSInteger tenTest = _scoreNumber % 20;
     
-    if (_scoreNumber > 0 && _scoreNumber < kSpeedRange2 ) {
+    if (_scoreNumber > 0 && _scoreNumber < kSpeedRange1 ) {
         if (tenTest ==  10 && _nowSpeed == kSpeed0) {
             _nowSpeed = kSpeed1;
             //NSLog(@"score %ld ,change to speed1", (long)_scoreNumber);
@@ -1745,11 +1750,15 @@
     //[self initGameCoins];
     
     //get cherry id
-    
-    
-    NSNumber  *cherryID_ =[_appDelegate.cherryIDSafeStore objectForKey:(__bridge id)(kSecAttrLabel)];
-    if (cherryID_  && [cherryID_ integerValue] != - 1) {
+    if (!_appDelegate.safeStore)
+    {
+        _appDelegate.safeStore = [UICKeyChainStore keyChainStore];
+    }
+    NSInteger cid =[[_appDelegate.safeStore stringForKey:@"cherry_id"] integerValue];
+    NSNumber  *cherryID_ = [NSNumber numberWithInteger:cid] ;
+    if (cherryID_  && [cherryID_ integerValue] != 0 ) {
         self.cherryID = cherryID_;
+        NSLog(@"Read cherry id:%@",cherryID_);
     }else {
         [self.connServer createUser];
     }
@@ -1853,7 +1862,8 @@
     if (theData != nil) {
         NSNumber *userID = [theData objectForKey:@"user_id"];
         self.cherryID  = userID;
-        [_appDelegate.cherryIDSafeStore setObject:userID forKey:(__bridge id)(kSecAttrLabel)];
+        [_appDelegate.safeStore setString:[userID stringValue] forKey:@"cherry_id"];
+        [_appDelegate.safeStore synchronize];
         
         NSLog(@"USER ID is : %@", userID );
     }

@@ -24,7 +24,7 @@
 	// If you want more flexibility, you can configure Cocos2D yourself instead of calling setupCocos2dWithOptions:.
 	[self setupCocos2dWithOptions:@{
 		// Show the FPS and draw call label.
-		CCSetupShowDebugStats: @(YES),
+		CCSetupShowDebugStats: @(NO),
 		
 		// More examples of options you might want to fiddle with:
 		// (See CCAppDelegate.h for more information)
@@ -44,7 +44,10 @@
 	}];
     [ThisIAPHelper sharedInstance];
     
-    self.cherryIDSafeStore = [[KeychainItemWrapper alloc] initWithIdentifier:@"cherry_board_id" accessGroup:nil];
+    //self.cherryIDSafeStore = [[KeychainItemWrapper alloc] initWithIdentifier:@"cherry_board_id" accessGroup:nil];
+    if (!self.safeStore) {
+        self.safeStore = [UICKeyChainStore keyChainStore];
+    }
     
     self.isProVersion = [self checkIsProVersion];
     
@@ -66,18 +69,21 @@
 // IAP
 -(void)makeIsProVersion{
     self.isProVersion = YES;
-    [self.cherryIDSafeStore setObject:@"IAP_OK" forKey:(__bridge id)kSecAttrAccount];
+    //[self.cherryIDSafeStore setObject:@"IAP_OK" forKey:(__bridge id)kSecAttrAccount];
+    [self.safeStore setString:@"IAP_OK" forKey:@"iap"];
+    [self.safeStore synchronize];
 }
 
 -(BOOL)checkIsProVersion
 {
-    NSString *isProStr = [self.cherryIDSafeStore objectForKey:(__bridge id)kSecAttrAccount];
+    NSString *isProStr =  [self.safeStore stringForKey:@"iap"];
     BOOL isPro = NO;
     if ([isProStr isEqualToString:@"IAP_OK"]) {
         isPro = YES;
     }
-//#warning -must change to isPro
+
     return isPro ;
+    //return YES;
 }
     //COCOS2D - ENTER POINT
 -(CCScene *)startScene
@@ -122,8 +128,7 @@
     mBannerView.rootViewController = self.navController;
     [self.navController.view addSubview:mBannerView];
     GADRequest *request = [GADRequest request];
-#ifdef DEBUG
-    
+#ifdef DEBUG    
          request.testDevices = [NSArray arrayWithObjects:GAD_SIMULATOR_ID,@"9e9b79b9aca390df80133e98cc96612a", nil];
 #endif
     

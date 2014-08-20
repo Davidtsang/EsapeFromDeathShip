@@ -12,10 +12,11 @@
 #import "GADBannerView.h"
 #import "ThisIAPHelper.h"
 #import "GameKitHelper.h"
-#import "KeychainItemWrapper.h"
+ 
+#import "UICKeyChainStore.h"
 
 #define kMyAppID @"906580965"
-#define kAPPStroeURL  @"https://itunes.apple.com/app/escape-from-death-ship/id906580965?mt=8"
+#define kAPPStroeURL  @"https://itunes.apple.com/us/app/escape-from-death-ship/id906580965?mt=8"
 #define ADMOB_BANNER_UNIT_ID @"ca-app-pub-3382314773591418/1563825481"
 
 typedef enum _bannerType
@@ -34,11 +35,13 @@ typedef enum _bannerType
     CocosBannerType mBannerType;
     GADBannerView *mBannerView;
     float on_x, on_y, off_x, off_y;
+    //UICKeyChainStore *_safeStore;
+    
 }
 @property(nonatomic,strong)NSString *fbSessionState;
 @property(nonatomic,assign)BOOL   isProVersion;
-@property(nonatomic,strong)KeychainItemWrapper *cherryIDSafeStore;
-
+//@property(nonatomic,strong)KeychainItemWrapper *cherryIDSafeStore;
+@property(nonatomic,strong)UICKeyChainStore * safeStore;
 -(void)hideBannerView;
 -(void)showBannerView;
 -(void)makeIsProVersion;

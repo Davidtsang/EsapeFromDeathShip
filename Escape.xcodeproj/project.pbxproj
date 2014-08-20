@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		CE15BD5B198E7B8E00ED78AD /* CommonFuns.m in Sources */ = {isa = PBXBuildFile; fileRef = CE15BD59198E7B8E00ED78AD /* CommonFuns.m */; };
-		CE15BD5E198E9D5900ED78AD /* KeychainItemWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = CE15BD5D198E9D5900ED78AD /* KeychainItemWrapper.m */; };
 		CE1B5B3F19A0FFE7006AC277 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = CE1B5B3C19A0FFE7006AC277 /* Default.png */; };
 		CE1B5B4019A0FFE7006AC277 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CE1B5B3D19A0FFE7006AC277 /* Default-568h@2x.png */; };
 		CE1B5B4119A0FFE7006AC277 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CE1B5B3E19A0FFE7006AC277 /* Default@2x.png */; };
@@ -313,8 +312,6 @@
 /* Begin PBXFileReference section */
 		CE15BD59198E7B8E00ED78AD /* CommonFuns.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonFuns.m; sourceTree = "<group>"; };
 		CE15BD5A198E7B8E00ED78AD /* CommonFuns.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonFuns.h; sourceTree = "<group>"; };
-		CE15BD5C198E9D5900ED78AD /* KeychainItemWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeychainItemWrapper.h; sourceTree = "<group>"; };
-		CE15BD5D198E9D5900ED78AD /* KeychainItemWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeychainItemWrapper.m; sourceTree = "<group>"; };
 		CE1B5B3C19A0FFE7006AC277 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		CE1B5B3D19A0FFE7006AC277 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		CE1B5B3E19A0FFE7006AC277 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
@@ -1105,8 +1102,6 @@
 				CE63AF12199663E800D8402B /* Admob */,
 				CE3564BA1994C55800317F9E /* AFNetworking */,
 				CE020DF0198F8C6D00FDA716 /* Fonts */,
-				CE15BD5C198E9D5900ED78AD /* KeychainItemWrapper.h */,
-				CE15BD5D198E9D5900ED78AD /* KeychainItemWrapper.m */,
 				CE678800198B543500214CCE /* Images */,
 				CE6787FF198B540000214CCE /* Sounds */,
 				CE7210981973D486001B5D98 /* Resources */,
@@ -2042,7 +2037,6 @@
 				CE7211951973D487001B5D98 /* CCTexturePVR.m in Sources */,
 				CE7212761973D488001B5D98 /* CCBReader.m in Sources */,
 				CE3564EB19950E7D00317F9E /* AFNetworkActivityIndicatorManager.m in Sources */,
-				CE15BD5E198E9D5900ED78AD /* KeychainItemWrapper.m in Sources */,
 				CE7212151973D487001B5D98 /* ALBuffer.m in Sources */,
 				CE3564F019950E7D00317F9E /* UIProgressView+AFNetworking.m in Sources */,
 				CE72121B1973D487001B5D98 /* ALChannelSource.m in Sources */,
