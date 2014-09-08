@@ -14,8 +14,7 @@
 
 static NSString *KeyHighScore = @"high_score";
 static NSString *kCoins =@"game_coins";
-
-// -----------------------------------------------------------------------
+ 
 
 #define kSceneHome 20
 #define kSceneGetReady 21

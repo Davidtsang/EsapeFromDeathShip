@@ -1758,7 +1758,7 @@
     NSNumber  *cherryID_ = [NSNumber numberWithInteger:cid] ;
     if (cherryID_  && [cherryID_ integerValue] != 0 ) {
         self.cherryID = cherryID_;
-        NSLog(@"Read cherry id:%@",cherryID_);
+        //NSLog(@"Read cherry id:%@",cherryID_);
     }else {
         [self.connServer createUser];
     }
@@ -1811,7 +1811,7 @@
 
 -(void)scoreSubmited:(NSNotification *)note
 {
-    NSLog(@"score,submited");
+    //NSLog(@"score,submited");
     [self.connServer getMyBeat:self.cherryID score:_scoreNumber];
 }
 -(void)gotBeatrank:(NSNotification *)note
@@ -1822,7 +1822,7 @@
         NSNumber *userRank = [theData objectForKey:@"user_rank"];
         self.beatrank  = [beatrank floatValue];
         
-        NSLog(@"Beatrank is : %@", beatrank );
+        //NSLog(@"Beatrank is : %@", beatrank );
         if (self.sceneType == kSceneGameOver) {
             
             CCNode  *share = [_gameOver getChildByName:@"btn-share" recursively:NO];

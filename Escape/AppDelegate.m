@@ -128,9 +128,10 @@
     mBannerView.rootViewController = self.navController;
     [self.navController.view addSubview:mBannerView];
     GADRequest *request = [GADRequest request];
-#ifdef DEBUG    
-         request.testDevices = [NSArray arrayWithObjects:GAD_SIMULATOR_ID,@"9e9b79b9aca390df80133e98cc96612a", nil];
-#endif
+    
+//#ifdef DEBUG    
+//         request.testDevices = [NSArray arrayWithObjects:GAD_SIMULATOR_ID,@"9e9b79b9aca390df80133e98cc96612a", nil];
+//#endif
     
     
     // Initiate a generic request to load it with an ad.
@@ -395,6 +396,12 @@
 	CCLOG(@"onScoresReceived: %@", [scores description]);
 	 GameKitHelper* gkHelper = [GameKitHelper sharedInstance];
 	[gkHelper showLeaderboard];
+}
+-(void) onFriendListReceived:(NSArray*)friends
+{
+}
+-(void) onPlayerInfoReceived:(NSArray*)players
+{
 }
 
 @end
